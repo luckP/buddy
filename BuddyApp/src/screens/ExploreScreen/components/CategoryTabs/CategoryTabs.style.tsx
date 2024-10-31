@@ -1,4 +1,5 @@
 import { StyleSheet } from 'react-native';
+import { COLORS } from '../../../../constants/theme';
 
 const styles = StyleSheet.create({
   container: {
@@ -15,15 +16,15 @@ const styles = StyleSheet.create({
   },
   activeTab: {
     borderBottomWidth: 3,
-    borderBottomColor: '#FFD700', // Highlighted color for selected tab
+    borderBottomColor: COLORS.primary, // Highlighted color for selected tab
   },
   tabText: {
     fontSize: 12,
-    color: '#666', // Default color for inactive tabs
+    color: COLORS.inactive, // Default color for inactive tabs
     marginTop: 5,
   },
   activeText: {
-    color: '#FFD700', // Color for active tab text
+    color: COLORS.primary, // Color for active tab text
   },
 });
 

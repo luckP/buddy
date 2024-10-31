@@ -17,4 +17,16 @@ export type AuthStackParamList = {
     AuthStack: undefined;
     MainTabs: undefined;
   };
+
+  export type MainMenuStackParamList = {
+    Home: undefined;
+    SocialNetworkScreen: undefined;
+    VirtualConsultations: undefined;
+    LostFoundPetScreen: undefined;
+    AdoptionPlatformScreen: undefined;
+    LostAndFoundScreen: undefined;
+    PetFriendlyPlacesScreen: undefined;
+    PhotoContentCreationScreen: undefined;
+    MarketPlaceScreen: undefined;
+  };
   

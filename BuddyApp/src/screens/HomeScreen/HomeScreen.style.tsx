@@ -1,19 +1,20 @@
 import { StyleSheet } from 'react-native';
+import { COLORS } from '../../constants/theme';
 
 const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
     paddingHorizontal: 20,
     paddingTop: 50,
-    backgroundColor: '#FFF',
+    backgroundColor: COLORS.white,
   },
   header: {
     alignItems: 'center',
-    marginBottom: 30,
+    marginBottom: 10,
   },
   logo: {
-    width: 150,
-    height: 150,
+    width: 100,
+    height: 100,
     resizeMode: 'contain',
   },
   cardContainer: {
@@ -26,7 +27,7 @@ const styles = StyleSheet.create({
     marginTop: 20,
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#333',
+    color: COLORS.black,
   },
 });
 

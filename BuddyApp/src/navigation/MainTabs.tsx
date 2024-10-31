@@ -18,6 +18,7 @@ const MainTabs: React.FC = () => {
         component={HomeScreen}
         options={{
           tabBarIcon: ({ color, size }) => <Icon name="home" color={color} size={size} />,
+          headerShown: false,
         }}
       />
       <Tab.Screen
@@ -25,6 +26,7 @@ const MainTabs: React.FC = () => {
         component={ExploreScreen}
         options={{
           tabBarIcon: ({ color, size }) => <Icon name="search" color={color} size={size} />,
+           headerShown: false,
         }}
       />
       <Tab.Screen

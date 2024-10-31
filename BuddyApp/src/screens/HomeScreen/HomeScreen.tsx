@@ -7,21 +7,45 @@ const HomeScreen: React.FC = () => {
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <View style={styles.header}>
-        <Image source={require('../../assets/logo.jpeg')} style={styles.logo} />
+        <Image source={require('../../assets/logoBuddy.png')} style={styles.logo} />
       </View>
 
       <View style={styles.cardContainer}>
         <Card 
           title="Rede Social BUDDIES"
           description="Connect with other pet owners and share moments."
-          image={require('../../assets/logo.jpeg')}
+          image={require('../../assets/images/home-card-images/card1.png')}
           icon="paw"
         />
         <Card 
-          title="Lost & Found Pet Locator"
+          title="Rede Social BUDDIES"
           description="Connect with other pet owners and share moments."
-          image={require('../../assets/logo.jpeg')}
-          icon="search"
+          image={require('../../assets/images/home-card-images/card2.png')}
+          icon="paw"
+        />
+        <Card 
+          title="Rede Social BUDDIES"
+          description="Connect with other pet owners and share moments."
+          image={require('../../assets/images/home-card-images/card3.png')}
+          icon="paw"
+        />
+        <Card 
+          title="Rede Social BUDDIES"
+          description="Connect with other pet owners and share moments."
+          image={require('../../assets/images/home-card-images/card4.png')}
+          icon="paw"
+        />
+        <Card 
+          title="Rede Social BUDDIES"
+          description="Connect with other pet owners and share moments."
+          image={require('../../assets/images/home-card-images/card5.png')}
+          icon="paw"
+        />
+        <Card 
+          title="Rede Social BUDDIES"
+          description="Connect with other pet owners and share moments."
+          image={require('../../assets/images/home-card-images/card6.png')}
+          icon="paw"
         />
         {/* Add more cards as needed */}
       </View>

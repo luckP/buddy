@@ -1,12 +1,13 @@
 import { StyleSheet } from 'react-native';
+import { COLORS } from '../../../../constants/theme';
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: '#FFF',
+    backgroundColor: COLORS.white,
     borderRadius: 10,
     padding: 15,
     marginBottom: 20,
-    shadowColor: '#000',
+    shadowColor: COLORS.black,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 8,
@@ -20,36 +21,57 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#333',
+    color: COLORS.black,
+  },
+  ratingContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 5,
   },
   rating: {
     fontSize: 14,
-    color: '#FFD700',
+    color: COLORS.black,
   },
   category: {
     fontSize: 14,
-    color: '#666',
+    color: COLORS.black,
     marginBottom: 10,
   },
-  image: {
-    width: 100,
-    height: 80,
-    borderRadius: 8,
+  likeButton: {
+    padding: 5,
+  },
+  imageContainer: {
+    flexDirection: 'row',
+    marginBottom: 10,
+  },
+  mainImage: {
+    width: 225,
+    height: 180,
+    borderRadius: 3,
     marginRight: 10,
+  },
+  thumbnailList: {
+    justifyContent: 'center',
+  },
+  thumbnailImage: {
+    width: 105,
+    height: 84,
+    borderRadius: 3,
+    marginBottom: 10,
   },
   times: {
     flexDirection: 'row',
     marginTop: 10,
   },
   timeButton: {
-    backgroundColor: '#FFD700',
+    backgroundColor: COLORS.primary,
     padding: 10,
     borderRadius: 20,
     marginRight: 10,
   },
   timeText: {
     fontSize: 12,
-    color: '#FFF',
+    color: COLORS.white,
   },
 });
 

@@ -21,7 +21,7 @@ const ProfileScreen: React.FC = () => {
       <UserInfo 
         name="John Doe"
         email="johndoe@example.com"
-        image={require('../../assets/logo.jpeg')} 
+        image={require('../../assets/logoBuddy.png')} 
       />
 
       <View style={styles.additionalInfo}>

@@ -23,7 +23,7 @@ const LoginScreen: React.FC = () => {
 
   return (
     <View style={styles.container}>
-      <Image source={require('../../assets/logo.jpeg')} style={styles.logo} />
+      <Image source={require('../../assets/logoBuddy.png')} style={styles.logo} />
 
       <Text style={styles.heading}>Welcome to Buddy!</Text>
       <Text style={styles.subHeading}>Connect with fellow pet owners and share your experience</Text>
@@ -44,7 +44,7 @@ const LoginScreen: React.FC = () => {
       </TouchableOpacity>
 
       <TouchableOpacity style={styles.googleButton}>
-        <Image source={require('../../assets/logo.jpeg')} style={styles.googleIcon} />
+        <Image source={require('../../assets/logoBuddy.png')} style={styles.googleIcon} />
         <Text style={styles.googleText}>Sign in with Google</Text>
       </TouchableOpacity>
     </View>
