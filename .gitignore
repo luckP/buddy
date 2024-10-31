@@ -1,0 +1,41 @@
+# Ignore Node.js dependencies
+/node_modules
+/server/node_modules
+/BuddyApp/node_modules
+
+# Ignore environment variable files
+*.env
+*.env.*
+
+# Ignore logs
+*.log
+**/*.log
+
+# Ignore Docker build files and related cache
+**/Dockerfile.*
+**/Dockerfile*
+docker-compose.override.yml
+
+# Ignore build output
+/server/dist
+/BuddyApp/android
+/BuddyApp/ios
+/BuddyApp/.gradle
+/BuddyApp/.idea
+/BuddyApp/vendor
+
+# Ignore React Native caches and generated files
+/BuddyApp/.expo
+/BuddyApp/.expo-shared
+/BuddyApp/.bundle
+
+# Ignore system files
+.DS_Store
+Thumbs.db
+
+# Ignore any editor-specific files
+.vscode/
+.idea/
+
+# Ignore local MongoDB data (in case it's being stored in a directory like mongo-data)
+mongo-data
