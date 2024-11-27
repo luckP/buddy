@@ -10,7 +10,7 @@ import { MainTabParamList } from './NavigationTypes';
 
 const Tab = createBottomTabNavigator<MainTabParamList>(); // Pass the types here
 
-const MainTabs: React.FC = () => {
+const Menu: React.FC = () => {
   return (
     <Tab.Navigator>
       <Tab.Screen
@@ -55,4 +55,4 @@ const MainTabs: React.FC = () => {
   );
 };
 
-export default MainTabs;
+export default Menu;

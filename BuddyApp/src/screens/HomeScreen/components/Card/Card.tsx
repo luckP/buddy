@@ -8,11 +8,12 @@ interface CardProps {
   description: string;
   image: any;
   icon: string;
+  onPress: (page: any) => void;
 }
 
-const Card: React.FC<CardProps> = ({ title, description, image, icon }) => {
+const Card: React.FC<CardProps> = ({ title, description, image, icon, onPress }) => {
   return (
-    <TouchableOpacity style={styles.card} onPress={() => console.log('test')}>
+    <TouchableOpacity style={styles.card} onPress={onPress}>
       <ImageBackground source={image} style={styles.cardImage}>
         <View style={styles.textContainer}>
           <Text style={styles.title}>{title}</Text>

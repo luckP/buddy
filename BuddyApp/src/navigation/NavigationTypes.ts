@@ -15,7 +15,8 @@ export type AuthStackParamList = {
   
   export type RootStackParamList = {
     AuthStack: undefined;
-    MainTabs: undefined;
+    Menu: undefined;
+    SocialMedia: undefined;
   };
 
   export type MainMenuStackParamList = {
@@ -28,5 +29,12 @@ export type AuthStackParamList = {
     PetFriendlyPlacesScreen: undefined;
     PhotoContentCreationScreen: undefined;
     MarketPlaceScreen: undefined;
+  };
+
+  export type SocialMediaStackParamList = {
+    Feed: undefined;
+    Comments: { postId: string };
+    CreatePost: undefined;
+    SocialProfile: {userId: string};
   };
   

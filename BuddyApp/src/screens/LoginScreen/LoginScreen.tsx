@@ -12,13 +12,13 @@ const LoginScreen: React.FC = () => {
   const loginHandler = () => {
     navigationRoot.reset({
       index: 0,
-      routes: [{ name: 'MainTabs' }], // Navigate to MainTabs after login
+      routes: [{ name: 'Menu' }],
     });
   };
 
   // Handler for register navigation
   const registerHandler = () => {
-    navigationAuth.navigate('Register'); // Navigate to RegisterScreen
+    navigationAuth.navigate('Register');
   };
 
   return (
