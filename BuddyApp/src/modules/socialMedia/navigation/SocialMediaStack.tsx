@@ -1,12 +1,10 @@
 import React from 'react';
-// import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createStackNavigator } from '@react-navigation/stack';
-import FeedScreen from '../screens/FeedScreen/FeedScreen';
-import { SocialMediaStackParamList } from './NavigationTypes';
 import CommentScreen from '../screens/CommentScreen/CommentScreen';
 import CreatePost from '../screens/CreatePostScreen/CreatePostScreen';
-import ProfileScreen from '../screens/ProfileScreen/ProfileScreen';
+import FeedScreen from '../screens/FeedScreen/FeedScreen';
 import SocialProfile from '../screens/SocialProfileScreen/SocialProfileScreen';
+import { SocialMediaStackParamList } from './NavigationTypes';
 
 const Stack = createStackNavigator<SocialMediaStackParamList>();
 

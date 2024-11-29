@@ -4,8 +4,8 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import styles from './PostCard.style';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from 'react-native-screens/lib/typescript/native-stack/types';
-import { SocialMediaStackParamList } from '../../../../navigation/NavigationTypes';
 import ImageDetail from '../ImageDetail/ImageDetail';
+import { SocialMediaStackParamList } from '../../navigation/NavigationTypes';
 
 type PostCardProps = {
     username: string;

@@ -18,7 +18,7 @@ const HomeScreen: React.FC = () => {
   }
 
   const onPressCardLostFound = () => {
-
+    navigationSocialMedia.navigate('LostPets');
   }
 
   const onPressCardAdoption = () => {

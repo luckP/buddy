@@ -8,7 +8,7 @@ import {
     TouchableOpacity,
     Text,
 } from 'react-native';
-import PostCard from './components/PostCard/PostCard';
+import PostCard from '../../components/PostCard/PostCard';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import styles from './FeedScreen.style';
 

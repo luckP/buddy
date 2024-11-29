@@ -1,11 +1,5 @@
 // src/navigation/NavigationTypes.ts
-export type AuthStackParamList = {
-    Login: undefined;
-    Register: undefined;
-    PasswordRecovery: undefined;
-  };
-  
-  export type MainTabParamList = {
+export type MainTabParamList = {
     Home: undefined;
     Explore: undefined;
     Friend: undefined;
@@ -17,6 +11,7 @@ export type AuthStackParamList = {
     AuthStack: undefined;
     Menu: undefined;
     SocialMedia: undefined;
+    LostPets: undefined;
   };
 
   export type MainMenuStackParamList = {
@@ -30,11 +25,3 @@ export type AuthStackParamList = {
     PhotoContentCreationScreen: undefined;
     MarketPlaceScreen: undefined;
   };
-
-  export type SocialMediaStackParamList = {
-    Feed: undefined;
-    Comments: { postId: string };
-    CreatePost: undefined;
-    SocialProfile: {userId: string};
-  };
-  

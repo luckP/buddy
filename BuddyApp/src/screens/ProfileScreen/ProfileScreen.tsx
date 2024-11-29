@@ -3,7 +3,7 @@ import { View, Text, Image, TouchableOpacity } from 'react-native';
 import styles from './ProfileScreen.style';
 import UserInfo from './components/UserInfo/UserInfo';
 import { NavigationProp, useNavigation } from '@react-navigation/native';
-import { AuthStackParamList, RootStackParamList } from '../../navigation/NavigationTypes';
+import { RootStackParamList } from '../../navigation/NavigationTypes';
 
 const ProfileScreen: React.FC = () => {
   const navigationRoot = useNavigation<NavigationProp<RootStackParamList>>();

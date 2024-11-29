@@ -2,7 +2,8 @@ import React from 'react';
 import { View, Text, TextInput, TouchableOpacity, Image } from 'react-native';
 import { useNavigation, NavigationProp } from '@react-navigation/native';
 import styles from './LoginScreen.style';
-import { AuthStackParamList, RootStackParamList } from '../../navigation/NavigationTypes'; // Use RootStackParamList
+import { RootStackParamList } from '../../../../navigation/NavigationTypes'; // Use RootStackParamList
+import { AuthStackParamList } from '../../navigation/NavigationTypes';
 
 const LoginScreen: React.FC = () => {
   const navigationRoot = useNavigation<NavigationProp<RootStackParamList>>();
@@ -23,7 +24,8 @@ const LoginScreen: React.FC = () => {
 
   return (
     <View style={styles.container}>
-      <Image source={require('../../assets/logoBuddy.png')} style={styles.logo} />
+      {/* <Image source={require('../../assets/logoBuddy.png')} style={styles.logo} /> */}
+      <Image source={require('../../../../assets/logoBuddy.png')} style={styles.logo} />
 
       <Text style={styles.heading}>Welcome to Buddy!</Text>
       <Text style={styles.subHeading}>Connect with fellow pet owners and share your experience</Text>
@@ -44,7 +46,7 @@ const LoginScreen: React.FC = () => {
       </TouchableOpacity>
 
       <TouchableOpacity style={styles.googleButton}>
-        <Image source={require('../../assets/logoBuddy.png')} style={styles.googleIcon} />
+        <Image source={require('../../../../assets/logoBuddy.png')} style={styles.googleIcon} />
         <Text style={styles.googleText}>Sign in with Google</Text>
       </TouchableOpacity>
     </View>

@@ -9,7 +9,7 @@ import {
     ActivityIndicator,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import PostCard from '../FeedScreen/components/PostCard/PostCard';
+import PostCard from '../../components/PostCard/PostCard';
 
 type SocialProfileProps = {
     id: string;
@@ -57,7 +57,7 @@ const SocialProfile = ({ route, navigation }: { route: any; navigation: any }) =
         }
     };
 
-    const retrieveUserPosts = async (userData?) => {
+    const retrieveUserPosts = async (userData?: any) => {
         if (loading || !hasMore) return;
 
         if (!userData) {
