@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     View,
     StyleSheet,
@@ -6,10 +6,18 @@ import {
     TouchableOpacity,
     Modal,
     Image,
+    Alert,
+    Platform,
 } from 'react-native';
-import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps'; // Import PROVIDER_GOOGLE
+import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
+import Geolocation from '@react-native-community/geolocation';
+import { check, request, PERMISSIONS, RESULTS } from 'react-native-permissions';
 
 const LostFoundMainScreen = ({ navigation }: { navigation: any }) => {
+    const [userLocation, setUserLocation] = useState({
+        latitude: 0,
+        longitude: 0,
+    });
     const [reports, setReports] = useState([
         {
             id: '1',
@@ -31,6 +39,47 @@ const LostFoundMainScreen = ({ navigation }: { navigation: any }) => {
         },
     ]);
     const [selectedReport, setSelectedReport] = useState<any>(null);
+    
+
+    // Get user's current location
+    const getUserLocation = async () => {
+        const permission =
+            Platform.OS === 'ios'
+                ? PERMISSIONS.IOS.LOCATION_WHEN_IN_USE
+                : PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION;
+    
+        // geolocation.requestAuthorization()
+
+        const permissionStatus = await check(permission);
+    
+        if (permissionStatus === RESULTS.GRANTED) {
+            Geolocation.getCurrentPosition(
+                (position) => {
+                    setUserLocation({
+                        latitude: position.coords.latitude,
+                        longitude: position.coords.longitude,
+                    });
+                },
+                (error) => {
+                    Alert.alert('Error', 'Unable to fetch location: ' + error.message);
+                },
+                { enableHighAccuracy: true, timeout: 20000, maximumAge: 1000 }
+            );
+        } else if (permissionStatus === RESULTS.DENIED) {
+            const requestStatus = await request(permission);
+            if (requestStatus === RESULTS.GRANTED) {
+                getUserLocation(); // Retry fetching location if granted
+            } else {
+                Alert.alert('Permission Denied', 'Location permission is required to show your location.');
+            }
+        } else {
+            Alert.alert('Error', 'Location permission is not available.');
+        }
+    };
+
+    useEffect(() => {
+        getUserLocation();
+    }, []);
 
     const handleMarkerPress = (report: any) => {
         setSelectedReport(report);
@@ -38,16 +87,17 @@ const LostFoundMainScreen = ({ navigation }: { navigation: any }) => {
 
     return (
         <View style={styles.container}>
-            {/* Map View with Google Maps Provider */}
+            {/* Map View */}
             <MapView
-                provider={PROVIDER_GOOGLE} // Use Google Maps provider
+                provider={PROVIDER_GOOGLE}
                 style={styles.map}
-                initialRegion={{
-                    latitude: 40.785091,
-                    longitude: -73.968285,
+                region={{
+                    latitude: userLocation.latitude || 40.785091,
+                    longitude: userLocation.longitude || -73.968285,
                     latitudeDelta: 0.05,
                     longitudeDelta: 0.05,
                 }}
+                showsUserLocation={true}
             >
                 {reports.map((report) => (
                     <Marker
@@ -55,6 +105,7 @@ const LostFoundMainScreen = ({ navigation }: { navigation: any }) => {
                         coordinate={report.location}
                         title={report.title}
                         description={report.description}
+                        pinColor={report.type === 'lost' ? 'red' : 'green'} // Different colors for lost and found
                         onPress={() => handleMarkerPress(report)}
                     />
                 ))}

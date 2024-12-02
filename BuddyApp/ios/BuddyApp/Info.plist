@@ -31,6 +31,41 @@
 		<key>NSAllowsLocalNetworking</key>
 		<true/>
 	</dict>
+
+<!-- permissions -->
+	<key>NSCameraUsageDescription</key>
+	<string>We need access to your camera to allow you to take photos and videos.</string>
+
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>We need access to your photo library to select images for uploading.</string>
+
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>We need access to your photo library to save photos or videos.</string>
+
+	<key>NSMicrophoneUsageDescription</key>
+	<string>We need access to your microphone to record audio.</string>
+
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>We need your location to show lost and found pets nearby.</string>
+
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>We need your location to track pets or provide location-based services.</string>
+
+	<key>NSLocationTemporaryUsageDescriptionDictionary</key>
+	<dict>
+		<key>LOCATION-PURPOSE</key>
+		<string>We need temporary location access for better services.</string>
+	</dict>
+
+	<key>NSBluetoothPeripheralUsageDescription</key>
+	<string>We need Bluetooth access to detect nearby Bluetooth-enabled devices.</string>
+
+	<key>NSUserTrackingUsageDescription</key>
+	<string>We need tracking permissions to improve recommendations and analytics.</string>
+
+
+
+
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string></string>
 	<key>UIAppFonts</key>
