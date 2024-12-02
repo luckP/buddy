@@ -3,6 +3,8 @@
 /server/node_modules
 /BuddyApp/node_modules
 
+*package-lock.json
+
 # Ignore environment variable files
 *.env
 *.env.*
@@ -45,3 +47,4 @@ Thumbs.db
 mongo-data
 
 /BuddyApp/vendor
+
