@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import * as ImagePicker from 'react-native-image-picker';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import { COLORS } from '../../../../constants/theme';
 
 const CreatePost = ({ navigation, route }: { navigation: any; route: any }) => {
     const [content, setContent] = useState('');
@@ -108,7 +109,7 @@ const styles = StyleSheet.create({
     imagePickerButton: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#1E90FF',
+        backgroundColor: COLORS.primary,
         padding: 10,
         borderRadius: 8,
         marginBottom: 20,
@@ -119,7 +120,7 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
     },
     submitButton: {
-        backgroundColor: '#1E90FF',
+        backgroundColor: COLORS.primary,
         padding: 15,
         borderRadius: 8,
         alignItems: 'center',

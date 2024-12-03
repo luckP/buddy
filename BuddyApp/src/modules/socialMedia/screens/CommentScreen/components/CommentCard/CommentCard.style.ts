@@ -1,4 +1,5 @@
 import { StyleSheet } from 'react-native';
+import { COLORS } from '../../../../../../constants/theme';
 
 export default StyleSheet.create({
     comment: {
@@ -62,7 +63,7 @@ export default StyleSheet.create({
     },
     replyButtonText: {
         fontSize: 14,
-        color: '#1E90FF',
+        color: COLORS.primary,
         marginLeft: 5,
     },
     replies: {

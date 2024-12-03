@@ -1,4 +1,5 @@
 import { StyleSheet } from 'react-native';
+import { COLORS } from '../../../../../../constants/theme';
 
 export default StyleSheet.create({
     overlay: {
@@ -47,7 +48,7 @@ export default StyleSheet.create({
     },
     submitButton: {
         flex: 1,
-        backgroundColor: '#1E90FF',
+        backgroundColor: COLORS.primary,
         paddingVertical: 12,
         borderRadius: 8,
         alignItems: 'center',

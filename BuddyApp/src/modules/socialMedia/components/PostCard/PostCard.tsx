@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, Image, TouchableOpacity } from 'react-native';
+import { View, Text, Image, TouchableOpacity, Share, Alert } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import styles from './PostCard.style';
 import { useNavigation } from '@react-navigation/native';
@@ -28,15 +28,38 @@ const PostCard: React.FC<PostCardProps> = ({ username, content, userImage, postI
         setLikeCount((prevCount) => (liked ? prevCount - 1 : prevCount + 1));
     };
 
-    const navifateToComments = () => {
+    const navigateToComments = () => {
         navigation.navigate('Comments', { postId });
-    }
+    };
 
     const navigateToProfile = () => {
         navigation.navigate('SocialProfile', {
             userId: '123',
         });
-    }
+    };
+
+    const handleShare = async () => {
+        try {
+            const result = await Share.share({
+                message: `Check out this post by ${username}: ${content}\n${postImage}`,
+                url: postImage, // If sharing an image URL
+                title: `Post by ${username}`, // Title for iOS
+            });
+
+            if (result.action === Share.sharedAction) {
+                if (result.activityType) {
+                    console.log(`Shared with activity type: ${result.activityType}`);
+                } else {
+                    console.log('Post shared successfully.');
+                }
+            } else if (result.action === Share.dismissedAction) {
+                console.log('Share dismissed.');
+            }
+        } catch (error) {
+            Alert.alert('Error', 'Unable to share the post.');
+            console.error('Error sharing post:', error);
+        }
+    };
 
     return (
         <View style={styles.card}>
@@ -56,7 +79,7 @@ const PostCard: React.FC<PostCardProps> = ({ username, content, userImage, postI
 
             {/* Like, Comment, and Share Section */}
             <View style={styles.actions}>
-            <TouchableOpacity onPress={toggleLike} style={styles.actionButton}>
+                <TouchableOpacity onPress={toggleLike} style={styles.actionButton}>
                     <Icon
                         name={liked ? 'heart' : 'heart-o'}
                         size={20}
@@ -65,12 +88,12 @@ const PostCard: React.FC<PostCardProps> = ({ username, content, userImage, postI
                     <Text style={styles.actionText}>{likeCount}</Text>
                 </TouchableOpacity>
 
-                <TouchableOpacity style={styles.actionButton} onPress={navifateToComments}>
+                <TouchableOpacity style={styles.actionButton} onPress={navigateToComments}>
                     <Icon name="comment-o" size={20} color="gray" />
                     <Text style={styles.actionText}>Comment</Text>
                 </TouchableOpacity>
 
-                <TouchableOpacity style={styles.actionButton}>
+                <TouchableOpacity style={styles.actionButton} onPress={handleShare}>
                     <Icon name="share" size={20} color="gray" />
                     <Text style={styles.actionText}>Share</Text>
                 </TouchableOpacity>
@@ -87,15 +110,3 @@ const PostCard: React.FC<PostCardProps> = ({ username, content, userImage, postI
 };
 
 export default PostCard;
-
-
-
-
-
-
-
-
-
-
-
-

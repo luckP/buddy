@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import PostCard from '../../components/PostCard/PostCard';
+import { COLORS } from '../../../../constants/theme';
 
 type SocialProfileProps = {
     id: string;
@@ -170,7 +171,7 @@ const styles = StyleSheet.create({
     header: {
         alignItems: 'center',
         padding: 20,
-        backgroundColor: '#1E90FF',
+        backgroundColor: COLORS.primary,
         borderBottomLeftRadius: 20,
         borderBottomRightRadius: 20,
     },
@@ -203,7 +204,7 @@ const styles = StyleSheet.create({
         position: 'absolute',
         top: 40,
         left: 20,
-        backgroundColor: '#1E90FF',
+        backgroundColor: COLORS.primary,
         padding: 10,
         borderRadius: 50,
         elevation: 5,

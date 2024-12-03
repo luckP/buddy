@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, Image, TouchableOpacity } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import styles from './CommentCard.style';
+import { COLORS } from '../../../../../../constants/theme';
 
 type CommentCardProps = {
     comment: {
@@ -56,7 +57,7 @@ const CommentCard: React.FC<CommentCardProps> = ({ comment, onReply }) => {
                     <Text style={styles.likeButtonText}>{likeCount}</Text>
                 </TouchableOpacity>
                 <TouchableOpacity onPress={() => onReply(comment.id)} style={styles.replyButton}>
-                    <Icon name="reply" size={20} color="#1E90FF" style={styles.icon} />
+                    <Icon name="reply" size={20} color={COLORS.primary} style={styles.icon} />
                     <Text style={styles.replyButtonText}>Reply</Text>
                 </TouchableOpacity>
             </View>
