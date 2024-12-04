@@ -1,0 +1,22 @@
+services:
+  server:
+    container_name: buddy-server
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3836:3000"
+    environment:
+      MONGO_URI: mongodb://buddy-mongo:27017/buddy_db
+    depends_on:
+      - buddy-mongo
+    volumes:
+      - .:/app
+
+  buddy-mongo:
+    image: mongo:4.0-xenial
+    container_name: buddy-mongo
+    ports:
+      - "27317:27017"
+    volumes:
+      - ./mongo-data:/data/db
