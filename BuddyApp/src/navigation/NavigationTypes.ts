@@ -3,7 +3,7 @@ export type MainTabParamList = {
     Home: undefined;
     Explore: undefined;
     Friend: undefined;
-    Message: undefined;
+    // Message: undefined;
     Profile: undefined;
   };
   
@@ -12,12 +12,13 @@ export type MainTabParamList = {
     Menu: undefined;
     SocialMedia: undefined;
     LostPets: undefined;
+    ChatBot: undefined;
   };
 
   export type MainMenuStackParamList = {
     Home: undefined;
     SocialNetworkScreen: undefined;
-    VirtualConsultations: undefined;
+    ChatBot: undefined;
     LostFoundPetScreen: undefined;
     AdoptionPlatformScreen: undefined;
     LostAndFoundScreen: undefined;

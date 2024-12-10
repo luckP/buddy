@@ -6,6 +6,7 @@ import Menu from './MainTabs';
 import SocialMediaStack from '../modules/socialMedia/navigation/SocialMediaStack';
 import { RootStackParamList } from './NavigationTypes'; // Import RootStack types
 import LostAndFoundPetLocatorStack from '../modules/lostAndFoundPetLocator/navigation/LostAndFoundPetLocator';
+import ChatBotStack from '../modules/chatBot/navigation/ChatBotNavigator';
 
 const Stack = createStackNavigator<RootStackParamList>(); // Use RootStackParamList for typing
 
@@ -20,6 +21,8 @@ const RootStack: React.FC = () => {
       <Stack.Screen name="SocialMedia" component={SocialMediaStack} options={{ headerShown: false }} />
       {/*Lost And Found Pet Locator */}
       <Stack.Screen name="LostPets" component={LostAndFoundPetLocatorStack} options={{ headerShown: false }} />
+      {/*ChatBot*/}
+      <Stack.Screen name="ChatBot" component={ChatBotStack} options={{ headerShown: false }} />
     </Stack.Navigator>
   );
 };

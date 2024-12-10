@@ -17,7 +17,7 @@ const styles = StyleSheet.create({
   cardImage: {
     width: '100%',
     height: 150,
-    justifyContent: 'flex-end', // Align text at the bottom
+    justifyContent: 'flex-start', // Align text at the bottom
     borderRadius: 10,
     overflow: 'hidden',
   },

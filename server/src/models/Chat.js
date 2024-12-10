@@ -8,6 +8,10 @@ const chatSchema = new mongoose.Schema({
     ref: 'User', // Reference the User model
     required: true,
   },
+  title:{
+    type: String,
+    required: true
+  },
   messages: [messageSchema], // Embed an array of messages
   createdAt: {
     type: Date,

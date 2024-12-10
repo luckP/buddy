@@ -13,8 +13,8 @@ const HomeScreen: React.FC = () => {
     navigationSocialMedia.navigate('SocialMedia');
   }
 
-  const onPressCardVirtualConsultation = () => {
-
+  const onPressCardChatBot = () => {
+    navigationSocialMedia.navigate('ChatBot');
   }
 
   const onPressCardLostFound = () => {
@@ -52,7 +52,7 @@ const HomeScreen: React.FC = () => {
           description="Conselhos e dicas imediatas e para perguntas gerais sobre cuidados de saúde."
           image={require('../../assets/images/home-card-images/card2.png')}
           icon="paw"
-          onPress={onPressCardVirtualConsultation}
+          onPress={onPressCardChatBot}
         />
         <Card 
           title="Lost & Found Pet Locator"

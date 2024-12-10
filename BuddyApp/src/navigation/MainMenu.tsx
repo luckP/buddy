@@ -16,7 +16,7 @@ const MainMenuStack: React.FC = () => {
     <Stack.Navigator>
       <Stack.Screen name="Home" component={HomeScreen} options={{ headerShown: false }} />
       <Stack.Screen name="SocialNetworkScreen" component={SocialNetworkScreen} options={{ headerShown: false }} />
-      <Stack.Screen name="VirtualConsultations" component={VirtualConsultationsScreen} options={{ headerShown: false }} />
+      <Stack.Screen name="ChatBot" component={VirtualConsultationsScreen} options={{ headerShown: false }} />
       <Stack.Screen name="AdoptionPlatformScreen" component={AdoptionPlatformScreen} options={{ headerShown: false }} />
       <Stack.Screen name="PetFriendlyPlacesScreen" component={PetFriendlyPlacesScreen} options={{ headerShown: false }} />
       <Stack.Screen name="PhotoContentCreationScreen" component={PhotoContentCreationScreen} options={{ headerShown: false }} />

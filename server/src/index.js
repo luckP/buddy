@@ -29,7 +29,7 @@ mongoose
 
 // OpenAI API Configuration
 const openai = new OpenAI({
-    apiKey: "your-openai-api-key", // Replace with your API key
+    apiKey: process.env.OPENAI_API_KEY, // Replace with your API key
 });
 
 // Example Routes
@@ -40,10 +40,14 @@ app.get('/', (req, res) => {
 // Example route using OpenAI API
 app.post('/chat', async (req, res) => {
   try {
-    const { chatId, userId, prompt } = req.body;
+    const { chatId, userId, prompt, allMessages } = req.body;
 
-    if (!userId || !prompt) {
+    if (!userId) {
       return res.status(400).json({ error: 'userId and prompt are required.' });
+    }
+
+    if(!allMessages && !prompt){
+      return res.status(400).json({ error: 'prompt is required.' });
     }
 
     // Validate the user exists
@@ -61,16 +65,49 @@ app.post('/chat', async (req, res) => {
         return res.status(404).json({ error: 'Chat not found or deleted.' });
       }
 
+      // Retrieve the all messages from the chat
+      if(allMessages){
+        const allMessages = chat.messages.map((msg) => {
+          return {
+            role: msg.role,
+            prompt: msg.prompt
+          }
+        });
+        return res.json({ chatId: chat._id, messages: allMessages, reply: ''});
+      }
+
       // Add the new user message to the chat
       chat.messages.push({ prompt, role: 'user', date: new Date() });
       await chat.save();
     } else {
       // Create a new chat
+      const response = await openai.chat.completions.create({
+        model: "gpt-4o-mini",
+        messages: [{ content: `Give me only a simple title for a chat that starts with: ${prompt}`, role: 'user' }],
+        // response_format: {
+        //   "type": "text"
+        // },
+        // temperature: 1,
+        // max_tokens: 2048,
+        // top_p: 1,
+        // frequency_penalty: 0,
+        // presence_penalty: 0
+      });
+
+      const title = response.choices[0].message.content;
+      const baseAssistantMessage = "Olá, sou sua assistente pessoal para ajudar você com qualquer tipo de problema que você possa ter com seus animais de estimação. Como posso ajudar você hoje?";
+
       chat = await Chat.create({
         user: userId,
-        messages: [{ prompt, role: 'user', date: new Date() }],
+        title: title.replaceAll('"', ''),
+        messages: [
+          { prompt: baseAssistantMessage, role: 'assistant', date: new Date()},
+          {prompt, role: 'user', date: new Date()}
+        ],
       });
     }
+
+    
 
     // Prepare messages for OpenAI
     const openAIMessages = chat.messages.map(msg => ({
@@ -79,25 +116,49 @@ app.post('/chat', async (req, res) => {
     }));
 
     // Call OpenAI API
-    // const completion = await openai.chat.completions.create({
-    //   model: 'gpt-4',
-    //   messages: openAIMessages,
-    // });
+    const completion = await openai.chat.completions.create({
+      model: 'gpt-4o-mini',
+      messages: openAIMessages,
+    });
 
     // Extract assistant's response
-    // const assistantMessage = completion.choices[0].message.content;
+    const assistantMessage = completion.choices[0].message.content;
 
     // Add the assistant's response to the chat
-    // chat.messages.push({ prompt: assistantMessage, role: 'assistant', date: new Date() });
+    chat.messages.push({ prompt: assistantMessage, role: 'assistant', date: new Date() });
     await chat.save();
 
-    // res.json({ chatId: chat._id, reply: assistantMessage });
-    res.json({ chatId: chat._id, chat: chat});
+    res.json({ chatId: chat._id, reply: assistantMessage, messages: [] });
+    // res.json({ response });
   } catch (error) {
     logger.error('Error handling chat:', error);
     res.status(500).json({ error: 'Something went wrong.' });
   }
 });
+
+app.get('/chatList', async (req, res) => {
+  try {
+    const { userId } = req.query; 
+
+    if (!userId) {
+      return res.status(400).json({ error: 'userId is required.' });
+    }
+
+    // Find all chats associated with the user
+    const chats = await Chat.find({ user: userId });
+    const chatListObj = chats.map((chat) => ({
+      chatId: chat._id,
+      title: chat.title,
+      createdAt: chat.createdAt,
+    }));
+
+    res.json(chatListObj); // Send the list of chats as the response
+  } catch (error) {
+    logger.error('Error handling chat list:', error);
+    res.status(500).json({ error: 'Something went wrong.' });
+  }
+});
+
 
 app.post('/crete-fake-user', async (req, res) => {
     try{
@@ -114,7 +175,6 @@ app.post('/crete-fake-user', async (req, res) => {
         logger.error('Error handling chat:', error);
         res.status(500).json({ error: 'Something went wrong.' });
       }
-
 });
 
 

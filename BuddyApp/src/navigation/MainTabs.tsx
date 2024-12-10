@@ -32,14 +32,14 @@ const Menu: React.FC = () => {
            headerShown: false,
         }}
       />
-      <Tab.Screen
+      {/* <Tab.Screen
         name="Message"
         component={ChatScreen}
         options={{
           tabBarIcon: ({ color, size }) => <Icon name="users" color={COLORS.primary} size={size} />,
           tabBarLabelStyle: {color: COLORS.primary},
         }}
-      />
+      /> */}
 
       <Tab.Screen
         name="Friend"
