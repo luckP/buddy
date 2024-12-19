@@ -2,9 +2,9 @@ import React from 'react';
 import { View, Text, Image, FlatList, TouchableOpacity } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import styles from './ServiceCard.style';
-import { COLORS } from '../../../../constants/theme';
-import ServiceCardProps from '../../../../models/ServiceCardProps';
 import Toast from 'react-native-toast-message';
+import ServiceCardProps from '../../../../../../models/ServiceCardProps';
+import { COLORS } from '../../../../../../constants/theme';
 
 
 
@@ -12,8 +12,8 @@ import Toast from 'react-native-toast-message';
 const ServiceCard: React.FC<ServiceCardProps> = ({ title, rating, category, price, times, liked }) => {
   // Example local images
   const localImages = [
-    require('../../../../assets/images/image1.png'),
-    require('../../../../assets/images/image2.png'),
+    require('../../../../../../assets/images/image1.png'),
+    require('../../../../../../assets/images/image2.png'),
   ];
 
   const [likedCard, setLikedCard] = React.useState(liked);

@@ -1,65 +1,37 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, FlatList } from 'react-native';
 import styles from './ExploreScreen.style';
 import CategoryTabs from './components/CategoryTabs/CategoryTabs';
 import ServiceCard from './components/ServiceCard/ServiceCard';
 import Icon from 'react-native-vector-icons/Ionicons'; // Make sure Ionicons is installed
-import { COLORS } from '../../constants/theme';
-import ServiceCardProps from '../../models/ServiceCardProps';
 import Filter from './components/Filter/Filter';
-
-
-const services: ServiceCardProps[] = [
-  {
-    id: 1,
-    title: 'Pawfect Groomers',
-    rating: 4.5,
-    category: 'Grooming',
-    price: '$$',
-    times: ['9:00 AM', '10:00 AM', '11:00 AM', '12:00 PM'],
-    images: ['image1.png', 'image2.png'], // Replace with actual image paths
-    liked: true,
-  },
-  {
-    id: 2,
-    title: 'Healthy Paws Vet',
-    rating: 5.0,
-    category: 'Veterinary',
-    price: '$$$',
-    times: ['9:00 AM', '10:00 AM', '11:00 AM', '12:00 PM'],
-    images: ['image3.png', 'image1.png'],
-    liked: false,
-  },
-  {
-    id: 3,
-    title: 'Healthy Paws Vet',
-    rating: 5.0,
-    category: 'Veterinary',
-    price: '$$$',
-    times: ['9:00 AM', '10:00 AM', '11:00 AM', '12:00 PM'],
-    images: ['image3.png', 'image1.png'],
-    liked: false,
-  },
-  {
-    id: 4,
-    title: 'Healthy Paws Vet',
-    rating: 5.0,
-    category: 'Veterinary',
-    price: '$$$',
-    times: ['9:00 AM', '10:00 AM', '11:00 AM', '12:00 PM'],
-    images: ['image3.png', 'image1.png'],
-    liked: false,
-  },
-  // Add more services as needed
-];
+import ServiceCardProps from '../../../../models/ServiceCardProps';
+import { COLORS } from '../../../../constants/theme';
+import { fetchStores } from '../../services/marketPlaceService';
 
 const ExploreScreen: React.FC = () => {
-
   const [selectedFilter, setSelectedFilter] = useState('All'); // Default selected filter
+  const [services, setServices] = useState<ServiceCardProps[]>([]);
 
   const handleFilterPress = (filter: string) => {
     setSelectedFilter(filter);
   };
+
+  const getServices = async () => {
+    try{
+      const res:ServiceCardProps[]  = await fetchStores();
+      setServices(res);
+    }
+    catch(error){
+      console.log(error);
+    }
+  }
+
+
+  // Fetch services from API
+  useEffect(() => {
+    getServices();
+  }, []);
 
   return (
     <FlatList

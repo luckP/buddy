@@ -1,8 +1,6 @@
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import HomeScreen from '../screens/HomeScreen/HomeScreen';
-import ExploreScreen from '../screens/ExploreScreen/ExploreScreen';
-import ChatScreen from '../screens/ChatScreen/ChatScreen';
 import FriendsScreen from '../screens/FriendsScreen/FriendsScreen';
 import ProfileScreen from '../screens/ProfileScreen/ProfileScreen';
 import Icon from 'react-native-vector-icons/FontAwesome';
@@ -23,7 +21,7 @@ const Menu: React.FC = () => {
           headerShown: false,
         }}
       />
-      <Tab.Screen
+      {/* <Tab.Screen
         name="Explore"
         component={ExploreScreen}
         options={{
@@ -31,7 +29,7 @@ const Menu: React.FC = () => {
           tabBarLabelStyle: {color: COLORS.primary},
            headerShown: false,
         }}
-      />
+      /> */}
       {/* <Tab.Screen
         name="Message"
         component={ChatScreen}

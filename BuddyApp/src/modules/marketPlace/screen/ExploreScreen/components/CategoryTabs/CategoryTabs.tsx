@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome'; // or another icon library
 import styles from './CategoryTabs.style';
-import { COLORS } from '../../../../constants/theme';
+import { COLORS } from '../../../../../../constants/theme';
 
 const CategoryTabs: React.FC = () => {
   const [selectedTab, setSelectedTab] = useState('All'); // Manage selected tab

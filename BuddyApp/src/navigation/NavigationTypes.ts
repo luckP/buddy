@@ -13,6 +13,8 @@ export type MainTabParamList = {
     SocialMedia: undefined;
     LostPets: undefined;
     ChatBot: undefined;
+    PetfriendlyPlaces: undefined;
+    MarketPlace: undefined;
   };
 
   export type MainMenuStackParamList = {

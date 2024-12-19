@@ -1,4 +1,4 @@
-const BASE_URL = "http://localhost:3836"; // Replace with your server's base URL
+const BASE_URL = "http://localhost:3836";
 
 export const fetchChatList = async (userId: string) => {
   try {

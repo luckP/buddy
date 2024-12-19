@@ -7,6 +7,9 @@ import SocialMediaStack from '../modules/socialMedia/navigation/SocialMediaStack
 import { RootStackParamList } from './NavigationTypes'; // Import RootStack types
 import LostAndFoundPetLocatorStack from '../modules/lostAndFoundPetLocator/navigation/LostAndFoundPetLocator';
 import ChatBotStack from '../modules/chatBot/navigation/ChatBotNavigator';
+import PetFriendlyPlacesStack from '../modules/petFriendlyPlaces/navigation/PetFriendlyPlaces';
+import MarketPlaceScreen from '../modules/marketPlace/screen/MarketPlaceScreen/MarketPlaceScreen';
+import MarketPlaceStack from '../modules/marketPlace/navigation/MarketPlace';
 
 const Stack = createStackNavigator<RootStackParamList>(); // Use RootStackParamList for typing
 
@@ -23,6 +26,10 @@ const RootStack: React.FC = () => {
       <Stack.Screen name="LostPets" component={LostAndFoundPetLocatorStack} options={{ headerShown: false }} />
       {/*ChatBot*/}
       <Stack.Screen name="ChatBot" component={ChatBotStack} options={{ headerShown: false }} />
+      {/*PetfriendlyPlaces*/}
+      <Stack.Screen name="PetfriendlyPlaces" component={PetFriendlyPlacesStack} options={{ headerShown: false }} />
+      {/*PetfriendlyPlaces*/}
+      <Stack.Screen name="MarketPlace" component={MarketPlaceStack} options={{ headerShown: false }} />
     </Stack.Navigator>
   );
 };

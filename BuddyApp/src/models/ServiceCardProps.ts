@@ -1,5 +1,5 @@
 interface ServiceCardProps {
-  id: number;
+  id: string;
   title: string;
   rating: number;
   category: string;

@@ -26,11 +26,11 @@ const HomeScreen: React.FC = () => {
   }
   
   const onPressCardPetFriendly = () => {
-
+    navigationSocialMedia.navigate('PetfriendlyPlaces');
   }
 
   const onPressCardMarketplace = () => {
-
+    navigationSocialMedia.navigate('MarketPlace');
   }
 
   return (
