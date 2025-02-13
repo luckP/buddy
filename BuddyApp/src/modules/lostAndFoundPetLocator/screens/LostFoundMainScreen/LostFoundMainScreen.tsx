@@ -8,7 +8,7 @@ import {
 } from "react-native";
 import MapView, { Marker, PROVIDER_GOOGLE, Region } from "react-native-maps";
 import LostAndFoundReport from "../../../../models/LostAndFoundReport";
-import { getReports } from "../../../../services/lostAndFoundService";
+import { getReports } from "../../services/lostAndFoundService";
 import SelectReportModal from "../../components/SelectReportModal/SelectReportModal";
 import TargetMarker from "../../components/TargetMarker/TargetMarker";
 import styles from "./LostFoundMainScreen.style";

@@ -25,10 +25,19 @@ const placesData = [
   },
 ];
 
-export const fetchPlaces = async () => {
+export const fetchPlaces = async (latitude: number, longitude: number) => {
   return new Promise((resolve) => {
+    const places = placesData.map((place) => {
+      const distance = Math.sqrt(
+        Math.pow(latitude - place.latitude, 2) + Math.pow(longitude - place.longitude, 2)
+      );
+      const id = place.id + Math.random();
+      const newLatitude = latitude + (Math.random() - 0.5) / 50;
+      const newLongitude = longitude + (Math.random() - 0.5) / 50;
+      return { ...place, id, latitude:newLatitude, longitude:newLongitude, distance };
+    });
     setTimeout(() => {
-      resolve(placesData);
-    }, 1000); // Simulating network delay
+      resolve(places);
+    }, 1000);
   });
 };

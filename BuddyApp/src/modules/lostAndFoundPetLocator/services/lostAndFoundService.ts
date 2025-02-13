@@ -1,5 +1,5 @@
-import LostAndFoundReport from '../models/LostAndFoundReport';
-import { apiFetch } from './api';
+import LostAndFoundReport from '../../../models/LostAndFoundReport';
+import { apiFetch } from '../../../services/api';
 
 // Fetch all reports
 export const getReports = async (latitude: number, longitude: number) => {
@@ -80,11 +80,7 @@ export const getReports = async (latitude: number, longitude: number) => {
                 type: "lost",
                 
             },
-        
-        
         ];
-
-
             resolve([...reports]);
         }, 1000);
     })

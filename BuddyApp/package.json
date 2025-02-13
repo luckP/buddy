@@ -12,11 +12,13 @@
   "dependencies": {
     "@react-native-community/cli-platform-ios": "^15.1.2",
     "@react-native-community/geolocation": "^3.4.0",
+    "@react-native-google-signin/google-signin": "^13.1.0",
     "@react-native-vector-icons/ionicons": "^7.4.0-alpha.34",
     "@react-navigation/bottom-tabs": "^6.6.1",
     "@react-navigation/native": "^6.1.18",
     "@react-navigation/stack": "^6.4.1",
     "@types/react-native-vector-icons": "^6.4.18",
+    "firebase": "^11.3.0",
     "react": "18.3.1",
     "react-native": "0.75.4",
     "react-native-gesture-handler": "^2.20.1",

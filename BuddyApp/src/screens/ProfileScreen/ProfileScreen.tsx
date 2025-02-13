@@ -1,19 +1,30 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, Image, TouchableOpacity } from 'react-native';
 import styles from './ProfileScreen.style';
 import UserInfo from './components/UserInfo/UserInfo';
 import { NavigationProp, useNavigation } from '@react-navigation/native';
 import { RootStackParamList } from '../../navigation/NavigationTypes';
+import { signOut } from 'firebase/auth';
+import { FIREBASE_AUTH } from '../../../FirebaseConfig';
+import { commonError } from '../../utils/utilsFunctions';
 
 const ProfileScreen: React.FC = () => {
   const navigationRoot = useNavigation<NavigationProp<RootStackParamList>>();
+  const [loading, setLoading] = useState(false);
 
 
-  const handleLogout = () => {
-    navigationRoot.reset({
-      index: 0,
-      routes:[{name: 'AuthStack'}]
-    })
+  const handleLogout = async () => {
+    try{
+      setLoading(true);
+      const res = await signOut(FIREBASE_AUTH)
+    }
+    catch(err){
+      console.log('DEBUG ERROR', JSON.stringify(err));
+      commonError();
+    }
+    finally{
+      setLoading(false);
+    }
   };
 
   return (

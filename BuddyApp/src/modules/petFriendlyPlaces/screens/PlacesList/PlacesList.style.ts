@@ -4,50 +4,73 @@ export default StyleSheet.create({
   container: {
     flex: 1,
   },
+  topMenu: {
+    flexDirection: 'row',
+    padding: 10,
+    backgroundColor: '#fff',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  searchBar: {
+    flex: 1,
+    height: 40,
+    borderColor: '#ccc',
+    borderWidth: 1,
+    borderRadius: 5,
+    paddingHorizontal: 10,
+    marginRight: 10,
+  },
+  toggleButton: {
+    paddingHorizontal: 15,
+    paddingVertical: 10,
+    borderRadius: 5,
+    backgroundColor: '#f0f0f0',
+  },
+  activeButton: {
+    backgroundColor: '#007AFF', // iOS blue style
+  },
+  toggleButtonText: {
+    color: '#fff',
+    fontWeight: 'bold',
+  },
   map: {
     flex: 1,
   },
-  markerContainer: {
-    alignItems: 'center',
+  list: {
+    flex: 1,
+    backgroundColor: '#f9f9f9',
   },
-  markerImage: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-  },
-  markerText: {
-    fontSize: 12,
-    fontWeight: 'bold',
-    marginTop: 5,
-    color: '#333',
-    backgroundColor: '#fff',
-    paddingHorizontal: 5,
+  listItem: {
+    flexDirection: 'row',
+    padding: 10,
+    marginVertical: 5,
+    marginHorizontal: 10,
     borderRadius: 5,
-    overflow: 'hidden',
-  },
-  detailContainer: {
-    position: 'absolute',
-    bottom: 20,
-    left: 20,
-    right: 20,
-    backgroundColor: 'white',
-    padding: 15,
-    borderRadius: 10,
+    backgroundColor: '#fff',
     shadowColor: '#000',
-    shadowOpacity: 0.2,
-    shadowRadius: 3,
-    elevation: 4,
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2,
   },
-  detailTitle: {
-    fontSize: 18,
+  listItemImage: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    marginRight: 10,
+  },
+  listItemContent: {
+    flex: 1,
+    justifyContent: 'center',
+  },
+  listItemTitle: {
+    fontSize: 16,
     fontWeight: 'bold',
-    marginBottom: 5,
+    color: '#333',
   },
-  detailDescription: {
+  listItemDescription: {
     fontSize: 14,
     color: '#666',
   },
-
   markerWrapper: {
     alignItems: 'center',
     justifyContent: 'center',
@@ -59,14 +82,13 @@ export default StyleSheet.create({
     height: 50,
     borderRadius: 25,
     borderWidth: 2,
-    borderColor: '#007AFF', // iOS blue style
+    borderColor: '#007AFF',
     backgroundColor: '#fff',
     overflow: 'hidden',
-    elevation: 3, // Adds shadow for Android
-    shadowColor: '#000',
-    shadowOpacity: 0.2,
-    shadowRadius: 3,
-    shadowOffset: { width: 0, height: 2 },
+  },
+  markerImage: {
+    width: '100%',
+    height: '100%',
   },
   markerLabelContainer: {
     backgroundColor: 'rgba(0, 0, 0, 0.7)',
@@ -74,17 +96,13 @@ export default StyleSheet.create({
     paddingVertical: 3,
     borderRadius: 5,
     position: 'absolute',
-    bottom: -2, // Adjust label position
+    bottom: 2,
     maxWidth: 80,
   },
   markerLabelText: {
     fontSize: 10,
     fontWeight: 'bold',
-    color: 'white',
+    color: '#fff',
     textAlign: 'center',
   },
 });
-
-
-
-

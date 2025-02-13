@@ -22,7 +22,7 @@ const HomeScreen: React.FC = () => {
   }
 
   const onPressCardAdoption = () => {
-
+    navigationSocialMedia.navigate('MarketPlace');
   }
   
   const onPressCardPetFriendly = () => {
