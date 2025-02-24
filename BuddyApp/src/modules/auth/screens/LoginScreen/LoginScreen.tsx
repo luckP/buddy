@@ -100,6 +100,11 @@ const LoginScreen: React.FC = () => {
     return setField(value);
   }
 
+  // Password recovery navigation
+  const passwordRecoveryHandler = () => {
+    navigationAuth.navigate('PasswordRecovery');
+  }
+
   // Handler for register navigation
   const registerHandler = () => {
     navigationAuth.navigate('Register');
@@ -119,7 +124,7 @@ const LoginScreen: React.FC = () => {
 
       {showError && <Text style={{ color: 'red' }}>Check your email or password</Text>}
 
-      <TouchableOpacity>
+      <TouchableOpacity onPress={passwordRecoveryHandler}>
         <Text style={styles.forgotPassword}>Forgot your password?</Text>
       </TouchableOpacity>
 
@@ -130,11 +135,12 @@ const LoginScreen: React.FC = () => {
       <TouchableOpacity onPress={registerHandler}>
         <Text style={styles.signUpText}>Don’t have an account? Sign Up</Text>
       </TouchableOpacity>
-
+      {/*
       <TouchableOpacity style={styles.googleButton} onPress={googleSingInHandler}>
         <Image source={require('../../../../assets/logoBuddy.png')} style={styles.googleIcon} />
         <Text style={styles.googleText}>Sign in with Google</Text>
       </TouchableOpacity>
+      */}
 
       {/* LOADING CONTAINER */}
       {loading && <View style={{ position: 'absolute', justifyContent: 'center', alignItems: 'center', backgroundColor: '#000000aa', width: '120%', height: '120%', top: 0, left: 0 }}>
