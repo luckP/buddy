@@ -3,14 +3,14 @@ import { View, Text, TextInput, TouchableOpacity, Alert, ActivityIndicator } fro
 import styles from './PasswordRecoveryScreen.style';
 import { NavigationProp, useNavigation } from '@react-navigation/native';
 import { AuthStackParamList } from '../../navigation/NavigationTypes';
-import { FIREBASE_AUTH } from '../../../../../FirebaseConfig';
-import { sendPasswordResetEmail } from 'firebase/auth';
+import { useAuth } from '../../../../context/AuthContext';
 
 const PasswordRecoveryScreen: React.FC = () => {
+  const { resetPassword } = useAuth(); // ✅ Use AuthContext for password reset
+  const navigationAuth = useNavigation<NavigationProp<AuthStackParamList>>();
+  
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
-  const navigationAuth = useNavigation<NavigationProp<AuthStackParamList>>();
-  const auth = FIREBASE_AUTH;
 
   const handlePasswordReset = async () => {
     if (!email) {
@@ -20,25 +20,11 @@ const PasswordRecoveryScreen: React.FC = () => {
 
     setLoading(true);
     try {
-      await sendPasswordResetEmail(auth, email);
+      await resetPassword(email);
       Alert.alert('Success', 'Password reset email sent. Please check your inbox.');
       navigationAuth.navigate('Login'); // Redirect back to login
-    } catch (error: any) {
-      console.error('Password Reset Error:', error);
-      Alert.alert('Error', firebaseErrorHandler(error.code));
     } finally {
       setLoading(false);
-    }
-  };
-
-  const firebaseErrorHandler = (errorCode: string): string => {
-    switch (errorCode) {
-      case 'auth/invalid-email':
-        return 'Invalid email format.';
-      case 'auth/user-not-found':
-        return 'No account found with this email.';
-      default:
-        return 'Failed to send password reset email. Please try again.';
     }
   };
 

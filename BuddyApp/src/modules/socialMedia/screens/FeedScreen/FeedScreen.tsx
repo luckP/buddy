@@ -2,77 +2,71 @@ import React, { useEffect, useState } from 'react';
 import {
     FlatList,
     View,
-    StyleSheet,
     ActivityIndicator,
     TextInput,
     TouchableOpacity,
     Text,
 } from 'react-native';
+import axios from 'axios';
+import { getAuth } from 'firebase/auth';
 import PostCard from '../../components/PostCard/PostCard';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import styles from './FeedScreen.style';
 
+const API_BASE_URL = 'http://localhost:3836/api'; // Backend URL
+
 const FeedScreen = ({ navigation }: { navigation: any }) => {
     const [posts, setPosts] = useState<any[]>([]);
-    const [filteredPosts, setFilteredPosts] = useState<any[]>([]); // For search functionality
-    const [loading, setLoading] = useState(true);
+    const [filteredPosts, setFilteredPosts] = useState<any[]>([]);
+    const [loading, setLoading] = useState(false);
     const [searchText, setSearchText] = useState('');
-    const [page, setPage] = useState(0);
+    const [page, setPage] = useState(1);
+    const [hasMore, setHasMore] = useState(true);
 
-    const retrievePosts = async () => {
+    // ✅ Fetch posts from backend
+    const fetchFeedPosts = async () => {
+        if (loading || !hasMore) return;
+
+        setLoading(true);
+
         try {
-            setLoading(true);
-            const data = await fakeFetchPosts(page);
-            setLoading(false);
-            const newPosts: any[] = data.posts || [];
-            if (newPosts.length > 0) {
-                setPage((prevPage) => prevPage + 1);
+            const auth = getAuth();
+            const user = auth.currentUser;
+
+            if (!user) {
+                console.error('User not authenticated');
+                return;
             }
-            setPosts((prevPosts) => [...prevPosts, ...newPosts]);
-            setFilteredPosts((prevPosts) => [...prevPosts, ...newPosts]); // Sync filtered posts
+
+            const token = await user.getIdToken();
+
+            const response = await axios.get(`${API_BASE_URL}/posts/feed?page=${page}&limit=10`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                },
+            });
+
+            const newPosts = response.data.posts || [];
+
+            if (newPosts.length === 0) {
+                setHasMore(false); // No more posts to fetch
+            }
+
+            setPosts(prevPosts => [...prevPosts, ...newPosts]);
+            setFilteredPosts(prevPosts => [...prevPosts, ...newPosts]); // Sync filtered posts
+            setPage(prevPage => prevPage + 1);
         } catch (error) {
+            console.error('Error fetching feed:', error);
+        } finally {
             setLoading(false);
-            console.log(error);
         }
     };
 
     useEffect(() => {
-        retrievePosts();
+        fetchFeedPosts();
     }, []);
 
-    const renderFooter = () => {
-        if (!loading) return null;
-        return <ActivityIndicator style={{ marginVertical: 20 }} />;
-    };
-
-    const fakeFetchPosts = async (page: number): Promise<any> => {
-        console.log('fakeFetchPosts', page);
-        return new Promise((resolve) => {
-            setTimeout(() => {
-                if (page > 1) {
-                    resolve({ posts: [] });
-                    return;
-                }
-
-                const numPerPage = 5;
-                const response = Array(numPerPage)
-                    .fill(null)
-                    .map((_, i) => ({
-                        id: page * numPerPage + i + '',
-                        username: `PetLover${page * numPerPage + i}`,
-                        content: 'Best buddies forever! 🐾',
-                        userImage: `https://randomuser.me/api/portraits/men/${
-                            page * numPerPage + i
-                        }.jpg`,
-                        postImage: `https://placecats.com/300/20${page * numPerPage + i}`,
-                    }));
-                resolve({
-                    posts: response,
-                });
-            }, 1000);
-        });
-    };
-
+    // ✅ Handle search filtering
     const handleSearch = (text: string) => {
         setSearchText(text);
         if (text.trim() === '') {
@@ -81,16 +75,16 @@ const FeedScreen = ({ navigation }: { navigation: any }) => {
         }
 
         const filtered = posts.filter(
-            (post) =>
-                post.username.toLowerCase().includes(text.toLowerCase()) ||
+            post =>
+                post.author.username.toLowerCase().includes(text.toLowerCase()) ||
                 post.content.toLowerCase().includes(text.toLowerCase())
         );
         setFilteredPosts(filtered);
     };
 
     const handleNewPost = (newPost: any) => {
-        setPosts((prevPosts) => [newPost, ...prevPosts]);
-        setFilteredPosts((prevPosts) => [newPost, ...prevPosts]);
+        setPosts(prevPosts => [newPost, ...prevPosts]);
+        setFilteredPosts(prevPosts => [newPost, ...prevPosts]);
     };
 
     return (
@@ -106,21 +100,22 @@ const FeedScreen = ({ navigation }: { navigation: any }) => {
             {/* Post List */}
             <FlatList
                 data={filteredPosts}
-                keyExtractor={(item) => item.id}
+                keyExtractor={(item) => item._id}
                 renderItem={({ item }) => (
+                    <>
+                    {/* <Text>{item.images.length ? item.images[0] : '-'}</Text> */}
                     <PostCard
-                        username={item.username}
+                        username={item.author.username}
                         content={item.content}
-                        userImage={item.userImage}
-                        postImage={item.postImage}
-                        postId={item.id}
-                    />
+                        userImage={item.author.profileImage}
+                        postImage={item.images.length > 0 ? item.images[0] : null}
+                        postId={item._id}
+                        />
+                        </>
                 )}
-                onEndReached={() => {
-                    if (!loading) retrievePosts(); // Fetch more posts on scroll down
-                }}
-                onEndReachedThreshold={0.5} // Trigger when 50% away from bottom
-                ListFooterComponent={renderFooter}
+                onEndReached={() => fetchFeedPosts()} // Load more posts on scroll
+                onEndReachedThreshold={0.5} // Load more when 50% away from bottom
+                ListFooterComponent={loading ? <ActivityIndicator style={{ marginVertical: 20 }} /> : null}
             />
 
             {/* Floating Button */}

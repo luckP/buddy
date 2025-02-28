@@ -1,20 +1,27 @@
 import React, { useState } from 'react';
 import {
-    View,
+    Alert,
+    Image,
     Text,
     TextInput,
     TouchableOpacity,
-    StyleSheet,
-    Image,
-    Alert,
+    View
 } from 'react-native';
 import * as ImagePicker from 'react-native-image-picker';
+import * as Location from 'react-native-location'; // ✅ Import Location API
 import Icon from 'react-native-vector-icons/FontAwesome';
-import { COLORS } from '../../../../constants/theme';
+import { createPost } from '../../../../services/postService';
+import styles from './CreatePostScreen.style';
+
+
+
+
+const API_BASE_URL = 'http://localhost:3836/api'; // ✅ Backend base URL
 
 const CreatePost = ({ navigation, route }: { navigation: any; route: any }) => {
     const [content, setContent] = useState('');
     const [image, setImage] = useState<string | null>(null);
+    const [loading, setLoading] = useState(false);
 
     const handleImagePicker = async () => {
         const result = await ImagePicker.launchImageLibrary({
@@ -27,27 +34,46 @@ const CreatePost = ({ navigation, route }: { navigation: any; route: any }) => {
         }
     };
 
-    const handleSubmit = () => {
+    const handleSubmit = async () => {
         if (!content.trim()) {
             Alert.alert('Error', 'Please write some content for your post.');
             return;
         }
-
-        const newPost = {
-            id: Math.random().toString(),
-            username: 'CurrentUser',
-            content,
-            userImage: 'https://randomuser.me/api/portraits/men/99.jpg', // Placeholder for the current user's avatar
-            postImage: image,
-        };
-
-        // Pass the new post back to the FeedScreen
-        if (route.params?.onPostCreated) {
-            route.params.onPostCreated(newPost);
+    
+        setLoading(true);
+    
+        try {
+            // ✅ Get user location safely
+            const userLocation = await Location.getLatestLocation();
+            if (!userLocation || !userLocation.longitude || !userLocation.latitude) {
+                Alert.alert('Error', 'Failed to retrieve location. Ensure GPS is enabled.');
+                return;
+            }
+    
+            // ✅ Structure the location object correctly
+            const location = {
+                type: 'Point',
+                coordinates: [userLocation.longitude, userLocation.latitude],
+            };
+    
+            console.log('DEBUG: Creating post with location:', location);
+    
+            // ✅ Send post request to backend
+            const newPost = await createPost(content, image, location);
+    
+            Alert.alert('Success', 'Post created successfully!');
+            if (route.params?.onPostCreated) {
+                route.params.onPostCreated(newPost);
+            }
+            navigation.goBack();
+        } catch (error: any) {
+            console.error('ERROR: Failed to create post:', error.response?.data || error.message);
+            Alert.alert('Error', 'Something went wrong. Please try again.');
+        } finally {
+            setLoading(false);
         }
-
-        navigation.goBack();
     };
+    
 
     return (
         <View style={styles.container}>
@@ -72,64 +98,12 @@ const CreatePost = ({ navigation, route }: { navigation: any; route: any }) => {
             </TouchableOpacity>
 
             {/* Submit Button */}
-            <TouchableOpacity onPress={handleSubmit} style={styles.submitButton}>
-                <Text style={styles.submitButtonText}>Post</Text>
+            <TouchableOpacity onPress={handleSubmit} style={styles.submitButton} disabled={loading}>
+                <Text style={styles.submitButtonText}>{loading ? 'Posting...' : 'Post'}</Text>
             </TouchableOpacity>
         </View>
     );
 };
 
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        padding: 20,
-        backgroundColor: '#f9f9f9',
-    },
-    title: {
-        fontSize: 20,
-        fontWeight: 'bold',
-        marginBottom: 20,
-    },
-    textInput: {
-        height: 100,
-        borderWidth: 1,
-        borderColor: '#ddd',
-        borderRadius: 8,
-        padding: 10,
-        backgroundColor: '#fff',
-        marginBottom: 20,
-        textAlignVertical: 'top',
-    },
-    previewImage: {
-        width: '100%',
-        height: 200,
-        marginBottom: 20,
-        borderRadius: 10,
-    },
-    imagePickerButton: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        backgroundColor: COLORS.primary,
-        padding: 10,
-        borderRadius: 8,
-        marginBottom: 20,
-    },
-    imagePickerButtonText: {
-        color: '#fff',
-        marginLeft: 10,
-        fontWeight: 'bold',
-    },
-    submitButton: {
-        backgroundColor: COLORS.primary,
-        padding: 15,
-        borderRadius: 8,
-        alignItems: 'center',
-    },
-    submitButtonText: {
-        color: '#fff',
-        fontSize: 16,
-        fontWeight: 'bold',
-    },
-});
 
 export default CreatePost;

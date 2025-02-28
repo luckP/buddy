@@ -16,6 +16,7 @@ const UserSchema = new mongoose.Schema(
     birthdate: { type: Date },
 
     // Social Engagement
+    friends: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }], // ✅ List of friends
     followersCount: { type: Number, default: 0 },
     followingCount: { type: Number, default: 0 },
     postsCount: { type: Number, default: 0 },

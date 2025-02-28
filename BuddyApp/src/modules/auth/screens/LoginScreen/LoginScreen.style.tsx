@@ -47,6 +47,23 @@ const styles = StyleSheet.create({
     borderColor: '#ccc',
     borderWidth: 1,
   },
+  passwordContainer: {
+    width: '100%',
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 8,
+    paddingHorizontal: 15,
+    marginBottom: 10,
+  },
+  passwordInput: {
+    flex: 1,
+    height: 50,
+  },
+  eyeIcon: {
+    padding: 10,
+  },
   forgotPassword: {
     color: '#888',
     fontSize: 14,

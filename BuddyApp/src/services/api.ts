@@ -1,23 +1,16 @@
-const BASE_URL = 'https://your-api-url.com';
+import axios from 'axios';
+import { FIREBASE_AUTH } from '../../FirebaseConfig';
 
-export const apiFetch = async (endpoint: string, options: RequestInit = {}) => {
-    try {
-        const response = await fetch(`${BASE_URL}${endpoint}`, {
-            headers: {
-                'Content-Type': 'application/json',
-                ...options.headers,
-            },
-            ...options,
-        });
+export const api = axios.create({
+  baseURL: 'https://your-api.com/api', // Change to your backend URL
+});
 
-        if (!response.ok) {
-            const error = await response.json();
-            throw new Error(error.message || 'Something went wrong');
-        }
-
-        return response.json();
-    } catch (error: any) {
-        console.error(`API Fetch Error: ${error.message}`);
-        throw error;
-    }
-};
+// Attach Firebase token to every request
+api.interceptors.request.use(async (config) => {
+  const user = FIREBASE_AUTH.currentUser;
+  if (user) {
+    const token = await user.getIdToken();
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});

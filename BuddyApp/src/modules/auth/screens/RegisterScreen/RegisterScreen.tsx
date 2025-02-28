@@ -1,19 +1,22 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
-import styles from './RegisterScreen.style';
 import { NavigationProp, useNavigation } from '@react-navigation/native';
+import styles from './RegisterScreen.style';
 import { AuthStackParamList } from '../../navigation/NavigationTypes';
-import { FIREBASE_AUTH } from '../../../../../FirebaseConfig';
-import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { useAuth } from '../../../../context/AuthContext';
+
+import Icon from 'react-native-vector-icons/FontAwesome'; // ✅ Import FontAwesome icons
 
 const RegisterScreen: React.FC = () => {
+  const { register } = useAuth(); // ✅ Use AuthContext instead of calling Firebase directly
+  const navigationAuth = useNavigation<NavigationProp<AuthStackParamList>>();
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [passwordVisible, setPasswordVisible] = useState(false); // ✅ Toggle state for password visibility
+  const [confirmPasswordVisible, setConfirmPasswordVisible] = useState(false); // ✅ Toggle state for confirm password visibility
   const [loading, setLoading] = useState(false);
-
-  const navigationAuth = useNavigation<NavigationProp<AuthStackParamList>>();
-  const auth = FIREBASE_AUTH;
 
   const handleRegister = async () => {
     if (!email || !password || !confirmPassword) {
@@ -28,28 +31,11 @@ const RegisterScreen: React.FC = () => {
 
     setLoading(true);
     try {
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-      console.log('User created:', userCredential.user);
+      await register(email, password);
       Alert.alert('Success', 'Account created successfully!');
       navigationAuth.navigate('Login'); // Navigate to login after successful signup
-    } catch (error: any) {
-      console.error('Firebase Registration Error:', error);
-      Alert.alert('Error', firebaseErrorHandler(error.code));
     } finally {
       setLoading(false);
-    }
-  };
-
-  const firebaseErrorHandler = (errorCode: string): string => {
-    switch (errorCode) {
-      case 'auth/email-already-in-use':
-        return 'This email is already in use.';
-      case 'auth/invalid-email':
-        return 'Invalid email address.';
-      case 'auth/weak-password':
-        return 'Password should be at least 6 characters.';
-      default:
-        return 'Registration failed. Please try again.';
     }
   };
 
@@ -66,23 +52,33 @@ const RegisterScreen: React.FC = () => {
         onChangeText={setEmail}
       />
 
-      <TextInput
-        style={styles.input}
-        placeholder="Password"
-        placeholderTextColor="#000"
-        secureTextEntry
-        value={password}
-        onChangeText={setPassword}
-      />
+      {/* ✅ Password Field with Eye Icon */}
+      <View style={styles.passwordContainer}>
+        <TextInput
+          onChangeText={setPassword}
+          style={styles.passwordInput}
+          placeholder="Password"
+          placeholderTextColor="#000"
+          secureTextEntry={!passwordVisible} // Toggle visibility
+        />
+        <TouchableOpacity onPress={() => setPasswordVisible(!passwordVisible)} style={styles.eyeIcon}>
+          <Icon name={passwordVisible ? "eye" : "eye-slash"} size={20} color="gray" />
+        </TouchableOpacity>
+      </View>
 
-      <TextInput
-        style={styles.input}
-        placeholder="Confirm Password"
-        placeholderTextColor="#000"
-        secureTextEntry
-        value={confirmPassword}
-        onChangeText={setConfirmPassword}
-      />
+      {/* ✅ Confirm Password Field with Eye Icon */}
+      <View style={styles.passwordContainer}>
+        <TextInput
+          onChangeText={setConfirmPassword}
+          style={styles.passwordInput}
+          placeholder="Confirm Password"
+          placeholderTextColor="#000"
+          secureTextEntry={!confirmPasswordVisible} // Toggle visibility
+        />
+        <TouchableOpacity onPress={() => setConfirmPasswordVisible(!confirmPasswordVisible)} style={styles.eyeIcon}>
+          <Icon name={confirmPasswordVisible ? "eye" : "eye-slash"} size={20} color="gray" />
+        </TouchableOpacity>
+      </View>
 
       <TouchableOpacity style={styles.registerButton} onPress={handleRegister} disabled={loading}>
         <Text style={styles.registerButtonText}>{loading ? 'Registering...' : 'Register'}</Text>

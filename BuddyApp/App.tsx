@@ -3,15 +3,17 @@ import { NavigationContainer } from '@react-navigation/native';
 import React from 'react';
 import Toast from 'react-native-toast-message';
 import RootStack from './src/navigation/RootStack'; // Use the RootStack
+import { AuthProvider } from './src/context/AuthContext';
 
 const App: React.FC = () => {
 
   return (
-    <NavigationContainer>
-      <RootStack />
-      <Toast />
-
-    </NavigationContainer>
+    <AuthProvider>
+      <NavigationContainer>
+        <RootStack />
+        <Toast />
+      </NavigationContainer>
+    </AuthProvider>
   );
 };
 

@@ -19,6 +19,7 @@ prepare_react_native_project!
 
 rn_maps_path = '../node_modules/react-native-maps'
 pod 'react-native-google-maps', :path => rn_maps_path
+pod 'react-native-location', :path => '../node_modules/react-native-location/react-native-location.podspec'
 
 # permissions
 # permissions_path = '../node_modules/react-native-permissions/ios'

@@ -9,3 +9,4 @@ export const commonError = (title?: string, text?: string, confirmHandlerFunctio
 
     Alert.alert(localTitle, localText, [ {text: 'OK', onPress: () => confirmFunction}]);
 }
+
