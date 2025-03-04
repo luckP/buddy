@@ -1,127 +1,118 @@
 import OpenAI from "openai";
-import Chat from '../models/chat.js';
-import User from '../models/userSchema.js';
-import dotenv from 'dotenv';
+import Chat from "../models/chat.js";
+import User from "../models/userSchema.js";
+import dotenv from "dotenv";
 
 dotenv.config();
 
-
-const openai = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY,
-});
+const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 /**
  * @route   POST /api/chat
- * @desc    Create or update a chat with AI responses
+ * @desc    Handles chat interactions (new or existing chats)
  * @access  Private
- * @param   {Object} req - Express request object
- * @param   {Object} req.body - Chat request payload
- * @param   {string} req.body.chatId - (Optional) Existing chat ID
- * @param   {string} req.body.prompt - User's message
- * @param   {boolean} req.body.allMessages - Flag to retrieve all messages
- * @param   {Object} res - Express response object
- * @returns {Object} JSON response with chat ID and reply message
  */
 export const createChat = async (req, res) => {
   try {
     const { chatId, prompt, allMessages } = req.body;
-    const userId = req.user.id; // Extract user ID from authenticated request
+    const userId = req.user._id;
 
-    if (!userId) {
-      return res.status(400).json({ error: 'User ID is required.' });
+    if (!prompt && !allMessages) {
+      return res.status(400).json({ error: "Prompt is required." });
     }
 
-    if (!allMessages && !prompt) {
-      return res.status(400).json({ error: 'Prompt is required.' });
-    }
-
+    // Ensure user exists
     const user = await User.findById(userId);
     if (!user) {
-      return res.status(404).json({ error: 'User not found.' });
+      return res.status(404).json({ error: "User not found." });
     }
 
     let chat;
 
     if (chatId) {
+      // Load existing chat
       chat = await Chat.findById(chatId);
       if (!chat || chat.isDeleted) {
-        return res.status(404).json({ error: 'Chat not found or deleted.' });
+        return res.status(404).json({ error: "Chat not found or deleted." });
       }
 
       if (allMessages) {
-        return res.json({ chatId: chat._id, messages: chat.messages, reply: '' });
+        return res.json({ chatId: chat._id, messages: chat.messages });
       }
 
-      chat.messages.push({ prompt, role: 'user', date: new Date() });
+      // Append new user message
+      chat.messages.push({ prompt, role: "user", date: new Date() });
       await chat.save();
     } else {
+      // Generate a chat title using AI
       const response = await openai.chat.completions.create({
         model: "gpt-4o-mini",
-        messages: [{ content: `Give me a simple title for a chat that starts with: ${prompt}`, role: 'user' }],
+        messages: [{ content: `Crie um título curto para um chat sobre: ${prompt}`, role: "user" }],
       });
 
-      const title = response.choices[0].message.content;
-      const baseAssistantMessage = "Olá, sou sua assistente para ajudar com questões sobre animais de estimação. Como posso ajudar?";
+      const title = response.choices[0]?.message?.content?.trim() || "Nova Conversa";
+
+      // **Ensure default assistant message**
+      const assistantMessage = {
+        prompt: "Olá! Sou sua assistente para dúvidas sobre animais de estimação. Como posso ajudar?",
+        role: "assistant",
+        date: new Date(),
+      };
 
       chat = await Chat.create({
         user: userId,
-        title: title.replaceAll('"', ''),
+        title: title.replaceAll('"', ""),
         messages: [
-          { prompt: baseAssistantMessage, role: 'assistant', date: new Date() },
-          { prompt, role: 'user', date: new Date() }
+          assistantMessage, // ✅ AI first message stored immediately
+          { prompt, role: "user", date: new Date() },
         ],
       });
     }
 
-    const openAIMessages = chat.messages.map(msg => ({
+    // Get AI response
+    const openAIMessages = chat.messages.map((msg) => ({
       role: msg.role,
       content: msg.prompt,
     }));
 
     const completion = await openai.chat.completions.create({
-      model: 'gpt-4o-mini',
+      model: "gpt-4o-mini",
       messages: openAIMessages,
     });
 
-    const assistantMessage = completion.choices[0].message.content;
+    let assistantReply = completion.choices[0]?.message?.content?.trim();
 
-    chat.messages.push({ prompt: assistantMessage, role: 'assistant', date: new Date() });
+    // **Ensure assistant reply is valid before saving**
+    if (!assistantReply) {
+      console.error("OpenAI response missing!");
+      assistantReply = "Desculpe, não consegui gerar uma resposta no momento.";
+    }
+
+    chat.messages.push({ prompt: assistantReply, role: "assistant", date: new Date() });
     await chat.save();
 
-    res.json({ chatId: chat._id, reply: assistantMessage, messages: [] });
+    res.json({ chatId: chat._id, reply: assistantReply });
   } catch (error) {
-    console.error('Error handling chat:', error);
-    res.status(500).json({ error: 'Something went wrong.' });
+    console.error("Chat Error:", error);
+    res.status(500).json({ error: "Something went wrong." });
   }
 };
 
-/**
- * @route   GET /api/chat/list
- * @desc    Retrieve all chats for a specific user
- * @access  Private
- * @param   {Object} req - Express request object
- * @param   {Object} req.query - Query parameters
- * @param   {string} req.query.userId - User ID to retrieve chats
- * @param   {Object} res - Express response object
- * @returns {Object} JSON response with list of chat objects
- */
+
 export const getChatList = async (req, res) => {
   try {
-    const userId = req.user.id;
-    if (!userId) {
-      return res.status(400).json({ error: 'User ID is required.' });
-    }
+    const userId = req.user._id;
+    const chats = await Chat.find({ user: userId }).sort({ createdAt: -1 });
 
-    const chats = await Chat.find({ user: userId });
-    const chatListObj = chats.map((chat) => ({
+    const chatList = chats.map((chat) => ({
       chatId: chat._id,
       title: chat.title,
       createdAt: chat.createdAt,
     }));
 
-    res.json(chatListObj);
+    res.json(chatList);
   } catch (error) {
-    console.error('Error handling chat list:', error);
-    res.status(500).json({ error: 'Something went wrong.' });
+    console.error("Chat List Error:", error);
+    res.status(500).json({ error: "Something went wrong." });
   }
 };

@@ -1,19 +1,21 @@
 import Geolocation from "@react-native-community/geolocation";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useCallback } from "react";
 import {
   Image,
   Text,
   TouchableOpacity,
-  View
+  View,
+  Alert,
 } from "react-native";
 import MapView, { Marker, PROVIDER_GOOGLE, Region } from "react-native-maps";
+import { useFocusEffect } from "@react-navigation/native"; // ✅ Ensure map resets on focus
 import LostAndFoundReport from "../../../../models/LostAndFoundReport";
 import { getReports } from "../../services/lostAndFoundService";
 import SelectReportModal from "../../components/SelectReportModal/SelectReportModal";
 import TargetMarker from "../../components/TargetMarker/TargetMarker";
 import styles from "./LostFoundMainScreen.style";
 
-const EPSILON = 0.0005; // Define the threshold for movement
+const EPSILON = 0.002; // ✅ Increase threshold to reduce unnecessary API calls
 
 const LostFoundMainScreen = ({ navigation }: { navigation: any }) => {
   const [userLocation, setUserLocation] = useState({
@@ -26,109 +28,145 @@ const LostFoundMainScreen = ({ navigation }: { navigation: any }) => {
   });
   const [reports, setReports] = useState<LostAndFoundReport[]>([]);
   const [selectedReport, setSelectedReport] = useState<any>(null);
+  const [mapReady, setMapReady] = useState(false);
 
+  const mapRef = useRef<MapView | null>(null);
   const debounceTimeout = useRef<NodeJS.Timeout | null>(null);
-  const lastRetrievedLocation = useRef({
-    latitude: 0,
-    longitude: 0,
-  });
+  const lastRetrievedLocation = useRef({ latitude: 0, longitude: 0 });
 
+  /**
+   * Fetch user location and center the map when screen is focused
+   */
   const getUserLocation = async () => {
+    
     Geolocation.getCurrentPosition(
       (position) => {
         const { latitude, longitude } = position.coords;
         setUserLocation({ latitude, longitude });
         setTargetLocation({ latitude, longitude });
+
+        console.log('DEBUG getUserLocation', new Date(), mapRef);
+        if (mapRef.current && mapReady) {
+          // mapRef.current.animateToRegion({
+          //   latitude,
+          //   longitude,
+          //   latitudeDelta: 0.05,
+          //   longitudeDelta: 0.05,
+          // });
+        }
+        else{
+          // setTimeout(() => getUserLocation(), 1000)
+        }
+
         retrieveReports(latitude, longitude);
       },
       (error) => {
         console.error("Error getting user location:", error);
+        Alert.alert("Location Error", "Could not retrieve your location.");
       },
       { enableHighAccuracy: true, timeout: 20000, maximumAge: 1000 }
     );
   };
 
-  const retrieveReports = async (latitude: number, longitude: number) => {
+  /**
+   * Fetch reports from backend based on location
+   */
+  const retrieveReports = useCallback(async (latitude: number, longitude: number) => {
     try {
-      const reports = await getReports(latitude, longitude);
-      setReports(reports);
-      lastRetrievedLocation.current = { latitude, longitude }; // Update the last retrieved location
-    } catch (error) {
-      console.error(error);
-    }
-  };
+      const fetchedReports = await getReports(latitude, longitude);
 
-  const handleRegionChangeComplete = (region: Region) => {
+      setReports(fetchedReports);
+      lastRetrievedLocation.current = { latitude, longitude };
+    } catch (error) {
+      console.error("Error fetching reports:", error);
+      Alert.alert("Error", "Could not fetch lost and found reports.");
+    }
+  }, []);
+
+  /**
+   * Handle when the map stops moving
+   */
+  const handleRegionChangeComplete = useCallback((region: Region) => {
+    console.log('DEBUG handleRegionChangeComplete', new Date());
     const distanceMoved = Math.sqrt(
       Math.pow(region.latitude - lastRetrievedLocation.current.latitude, 2) +
       Math.pow(region.longitude - lastRetrievedLocation.current.longitude, 2)
     );
 
-    setTargetLocation({
-      latitude: region.latitude,
-      longitude: region.longitude,
-    });
+    setTargetLocation({ latitude: region.latitude, longitude: region.longitude });
 
-    // Check if the movement exceeds the epsilon value
     if (distanceMoved > EPSILON) {
-      // Clear the previous timeout to debounce
       if (debounceTimeout.current) {
         clearTimeout(debounceTimeout.current);
       }
-
-      // Set a new timeout
       debounceTimeout.current = setTimeout(() => {
         retrieveReports(region.latitude, region.longitude);
       }, 500); // 0.5-second debounce
     }
-  };
+  }, [retrieveReports]);
 
-  useEffect(() => {
-    getUserLocation();
-  }, []);
+  /**
+   * Run when screen loads and when screen is focused
+   */
+  useFocusEffect(
+    useCallback(() => {
+      getUserLocation();
+    }, [])
+  );
 
-  const handleMarkerPress = (report: any) => {
+  /**
+   * Open report details when a marker is clicked
+   */
+  const handleMarkerPress = (report: LostAndFoundReport) => {
     setSelectedReport(report);
   };
 
   return (
     <View style={styles.container}>
       {/* Map View */}
-      <MapView
+      {<MapView
+        ref={mapRef}
         provider={PROVIDER_GOOGLE}
         style={styles.map}
         initialRegion={{
-          latitude: userLocation.latitude || 40.785091,
-          longitude: userLocation.longitude || -73.968285,
+          latitude: userLocation.latitude || 41.15567604262148, 
+          longitude: userLocation.longitude || -8.634555737712859,
           latitudeDelta: 0.05,
           longitudeDelta: 0.05,
         }}
         onRegionChangeComplete={handleRegionChangeComplete}
+        onMapReady={() => {
+          setMapReady(true);
+          
+        }}
         showsUserLocation={true}
       >
         {/* Lost and Found Reports Markers */}
-        {reports.map((report) => (
+        {userLocation.latitude!=0 && reports.map((report) => (
           <Marker
             key={report.id}
             coordinate={{
-              latitude: report.latitude,
-              longitude: report.longitude,
+              latitude: report.location.coordinates[1], // GeoJSON [longitude, latitude]
+              longitude: report.location.coordinates[0],
             }}
             onPress={() => handleMarkerPress(report)}
           >
             {/* Custom Marker View */}
             <View style={styles.customMarker}>
-              <Image
-                source={{ uri: report.images[0] }}
-                style={styles.markerImage}
-              />
-              <Text style={styles.markerText}>
-                {report.type === "lost" ? "Lost" : "Found"}
-              </Text>
+              {report.images?.length > 0 ? (
+                <>
+                <Text>{report.images[0]}</Text>
+                <Image source={{ uri: report.images[0] }} style={styles.markerImage} />
+                </>
+              ) : (
+                <View style={styles.noImageMarker}>
+                  <Text style={styles.markerText}>{report.status.toUpperCase()}</Text>
+                </View>
+              )}
             </View>
           </Marker>
         ))}
-      </MapView>
+      </MapView>}
 
       {/* Target Marker */}
       <TargetMarker />
@@ -159,7 +197,5 @@ const LostFoundMainScreen = ({ navigation }: { navigation: any }) => {
     </View>
   );
 };
-
-
 
 export default LostFoundMainScreen;

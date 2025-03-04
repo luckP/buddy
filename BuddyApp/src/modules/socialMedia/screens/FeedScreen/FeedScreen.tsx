@@ -46,6 +46,7 @@ const FeedScreen = ({ navigation }: { navigation: any }) => {
                 },
             });
 
+
             const newPosts = response.data.posts || [];
 
             if (newPosts.length === 0) {
@@ -102,8 +103,6 @@ const FeedScreen = ({ navigation }: { navigation: any }) => {
                 data={filteredPosts}
                 keyExtractor={(item) => item._id}
                 renderItem={({ item }) => (
-                    <>
-                    {/* <Text>{item.images.length ? item.images[0] : '-'}</Text> */}
                     <PostCard
                         username={item.author.username}
                         content={item.content}
@@ -111,7 +110,6 @@ const FeedScreen = ({ navigation }: { navigation: any }) => {
                         postImage={item.images.length > 0 ? item.images[0] : null}
                         postId={item._id}
                         />
-                        </>
                 )}
                 onEndReached={() => fetchFeedPosts()} // Load more posts on scroll
                 onEndReachedThreshold={0.5} // Load more when 50% away from bottom

@@ -10,7 +10,7 @@ import {
 import * as ImagePicker from 'react-native-image-picker';
 import * as Location from 'react-native-location'; // ✅ Import Location API
 import Icon from 'react-native-vector-icons/FontAwesome';
-import { createPost } from '../../../../services/postService';
+import { createPost } from '../../services/postService';
 import styles from './CreatePostScreen.style';
 
 

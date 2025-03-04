@@ -64,6 +64,7 @@ const PostCard: React.FC<PostCardProps> = ({ username, content, userImage, postI
     return (
         <View style={styles.card}>
             {/* User Info */}
+            
             <TouchableOpacity style={styles.header} onPress={navigateToProfile}>
                 <Image source={{ uri: userImage }} style={styles.userImage} />
                 <Text style={styles.username}>{username}</Text>

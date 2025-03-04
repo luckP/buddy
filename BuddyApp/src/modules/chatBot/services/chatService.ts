@@ -1,73 +1,59 @@
-const BASE_URL = "http://localhost:3836";
+import axios from "axios";
+import { getAuth } from "firebase/auth";
+import IaChatMessage from "../../../models/IaChatMessage";
 
-export const fetchChatList = async (userId: string) => {
+const BASE_URL = "http://localhost:3836/api/chat";
+
+/**
+ * Fetches Firebase authentication headers.
+ */
+const getAuthHeaders = async () => {
+  const auth = getAuth();
+  const user = auth.currentUser;
+  if (!user) throw new Error("User is not authenticated");
+  const token = await user.getIdToken();
+  return { Authorization: `Bearer ${token}`, "Content-Type": "application/json" };
+};
+
+/**
+ * Fetches the chat list for the authenticated user.
+ */
+export const fetchChatList = async () => {
   try {
-    const response = await fetch(`${BASE_URL}/chatList?userId=${userId}`);
-    if (!response.ok) {
-      throw new Error("Failed to fetch chat list");
-    }
-    return await response.json();
+    const headers = await getAuthHeaders();
+    const response = await axios.get(`${BASE_URL}/list`, { headers });
+
+    // ✅ Ensure response contains a valid array
+    return response.data || [];
   } catch (error) {
     console.error("Error fetching chat list:", error);
     throw error;
   }
 };
 
-export const fetchChatMessages = async (
-  chatId: string,
-  userId: string,
-  prompt?: string
-) => {
-  try {
-    const response = await fetch(`${BASE_URL}/chat`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ chatId, userId, prompt, allMessages: true }),
-    });
-    if (!response.ok) {
-      throw new Error("Failed to fetch chat messages");
-    }
-    return await response.json();
-  } catch (error) {
-    console.error("Error fetching chat messages:", error);
-    throw error;
-  }
+/**
+ * Fetch chat messages for a given chat ID.
+ */
+export const fetchChatMessages = async (chatId: string): Promise<IaChatMessage[]> => {
+  const headers = await getAuthHeaders();
+  const response = await axios.post(`${BASE_URL}`, { chatId, allMessages: true }, { headers });
+  return response.data.messages;
 };
 
-export const createNewChat = async (userId: string, prompt: string) => {
-  try {
-    const response = await fetch(`${BASE_URL}/chat`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ userId, prompt, allMessages: true }),
-    });
-    if (!response.ok) {
-      throw new Error("Failed to create new chat");
-    }
-    return await response.json();
-  } catch (error) {
-    console.error("Error creating new chat:", error);
-    throw error;
-  }
+/**
+ * Creates a new chat session.
+ */
+export const createNewChat = async (prompt: string) => {
+  const headers = await getAuthHeaders();
+  const response = await axios.post(`${BASE_URL}`, { prompt, allMessages: false }, { headers });
+  return response.data;
 };
 
-export const createNewMessage = async (
-  chatId: string,
-  userId: string,
-  prompt: string
-) => {
-  try {
-    const response = await fetch(`${BASE_URL}/chat`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ chatId, userId, prompt }),
-    });
-    if (!response.ok) {
-      throw new Error("Failed to send new message");
-    }
-    return await response.json();
-  } catch (error) {
-    console.error("Error sending new message:", error);
-    throw error;
-  }
+/**
+ * Sends a message to an existing chat.
+ */
+export const createNewMessage = async (chatId: string, prompt: string) => {
+  const headers = await getAuthHeaders();
+  const response = await axios.post(`${BASE_URL}`, { chatId, prompt }, { headers });
+  return response.data;
 };

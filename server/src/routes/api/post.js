@@ -14,9 +14,9 @@ const router = express.Router();
 
 // ✅ Use the `upload` middleware for handling file uploads
 router.post('/', authenticateUser, upload.array('images', 5), createPost);
-router.get('/', getPosts);
+router.get('/', authenticateUser, getPosts);
 router.get('/feed', authenticateUser, getFeedPosts);
-router.get('/:id', getPostById);
+router.get('/:id', authenticateUser, getPostById);
 router.put('/:id', authenticateUser, updatePost);
 router.delete('/:id', authenticateUser, deletePost);
 
