@@ -14,8 +14,6 @@ export const getReports = async (latitude: number, longitude: number) => {
       params: { latitude, longitude, radius: 5 },
     });
 
-
-    console.log("responseresponseresponseresponseresponseresponseresponse", response.data);
     return response.data;
   } catch (error) {
     console.error("ERROR: Failed to fetch lost/found reports", error);
@@ -57,7 +55,7 @@ export const createReport = async (
   formData.append("description", description);
   formData.append("status", status);
   formData.append("location", geoLocation);
-  formData.append("userId", userId); // Send user ID for directory storage
+  formData.append("userId", userId);
 
   // Append images properly
   images.forEach((image, index) => {

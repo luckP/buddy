@@ -20,6 +20,7 @@ docker-compose.override.yml
 
 # Ignore build output
 /server/dist
+/server/src/upload
 
 # Ignore specific files in Android and iOS folders
 /BuddyApp/android/.gradle
@@ -47,4 +48,6 @@ Thumbs.db
 mongo-data
 
 /BuddyApp/vendor
+
+
 
