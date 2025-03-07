@@ -9,8 +9,8 @@ import {
 } from 'react-native';
 import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 import styles from './PlacesList.style';
-import { fetchPlaces } from '../../services/placesService';
 import Geolocation from '@react-native-community/geolocation';
+import { fetchPlaces } from '../../services/placesService';
 
 const PlacesList = ({ navigation }: any) => {
   const [places, setPlaces] = useState([]);
@@ -25,25 +25,9 @@ const PlacesList = ({ navigation }: any) => {
   });
   const [locationLoaded, setLocationLoaded] = useState(false);
 
-
   const getUserLocation = () => {
-    const loadPlaces = async (location: {
-      latitude: number;
-      longitude: number;
-    }) => {
-      try {
-        const data: any = await fetchPlaces(location.latitude, location.longitude);
-        setPlaces(data);
-        setFilteredPlaces(data); // Initialize filteredPlaces
-      } catch (error) {
-        console.error('Error loading places:', error);
-      }
-    };
-
-
-
     Geolocation.getCurrentPosition(
-      (position) => {
+      async (position) => {
         const { latitude, longitude } = position.coords;
         setCurrentLocation({
           latitude,
@@ -52,10 +36,17 @@ const PlacesList = ({ navigation }: any) => {
           longitudeDelta: 0.05,
         });
         setLocationLoaded(true);
-        loadPlaces({
-          latitude,
-          longitude,
-        });
+
+        console.log('User location:', latitude, longitude);
+
+        // Fetch places from the backend
+        try {
+          const data: any = await fetchPlaces(latitude, longitude).then();
+          setPlaces(data);
+          setFilteredPlaces(data);
+        } catch (error) {
+          console.error('Error loading places:', error);
+        }
       },
       (error) => {
         console.error('Error retrieving user location:', error);
@@ -65,31 +56,9 @@ const PlacesList = ({ navigation }: any) => {
     );
   };
 
-  const handleRegionChangeComplete = (region: any) => {
-  };
-
   useEffect(() => {
-    
-
     getUserLocation();
   }, []);
-
-  useEffect(() => {
-    // Fetch places whenever the location changes
-    const loadPlacesOnRegionChange = async () => {
-      try {
-        const data: any = await fetchPlaces(currentLocation.latitude, currentLocation.longitude);
-        setPlaces(data);
-        setFilteredPlaces(data);
-      } catch (error) {
-        console.error('Error loading places after region change:', error);
-      }
-    };
-
-    if (currentLocation.latitude !== 0 && currentLocation.longitude !== 0) {
-      loadPlacesOnRegionChange();
-    }
-  }, [currentLocation]);
 
   const handleSearch = (text: string) => {
     setSearchTerm(text);
@@ -108,7 +77,7 @@ const PlacesList = ({ navigation }: any) => {
       style={styles.listItem}
       onPress={() => navigation.navigate('PlaceDetails', { place: item })}
     >
-      <Image source={{ uri: item.image }} style={styles.listItemImage} />
+      <Image source={{ uri: item.images[0] }} style={styles.listItemImage} />
       <View style={styles.listItemContent}>
         <Text style={styles.listItemTitle}>{item.name}</Text>
         <Text style={styles.listItemDescription} numberOfLines={2}>
@@ -149,15 +118,14 @@ const PlacesList = ({ navigation }: any) => {
             provider={PROVIDER_GOOGLE}
             style={styles.map}
             region={currentLocation}
-            onRegionChangeComplete={handleRegionChangeComplete}
             showsUserLocation={true}
           >
             {filteredPlaces.map((place: any) => (
               <Marker
-                key={place.id}
+                key={place._id}
                 coordinate={{
-                  latitude: place.latitude,
-                  longitude: place.longitude,
+                  latitude: place.location.coordinates[1], // GeoJSON stores [lng, lat]
+                  longitude: place.location.coordinates[0],
                 }}
                 onPress={() =>
                   navigation.navigate('PlaceDetails', { place })
@@ -166,7 +134,7 @@ const PlacesList = ({ navigation }: any) => {
                 <View style={styles.markerWrapper}>
                   <View style={styles.markerImageContainer}>
                     <Image
-                      source={{ uri: place.image }}
+                      source={{ uri: place.images[0] }}
                       style={styles.markerImage}
                     />
                   </View>
@@ -182,7 +150,7 @@ const PlacesList = ({ navigation }: any) => {
         ) : (
           <FlatList
             data={filteredPlaces}
-            keyExtractor={(item: any) => item.id}
+            keyExtractor={(item: any) => item._id}
             renderItem={renderListItem}
             style={styles.list}
           />
@@ -194,7 +162,6 @@ const PlacesList = ({ navigation }: any) => {
       )}
     </View>
   );
-  
 };
 
 export default PlacesList;

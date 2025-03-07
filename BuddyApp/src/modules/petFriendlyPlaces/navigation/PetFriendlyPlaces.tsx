@@ -3,12 +3,18 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { PetFriendlyPlacesStackParamList } from './NavigationTypes';
 import PlacesList from '../screens/PlacesList/PlacesList';
 import PlaceDetails from '../screens/PlaceDetails/PlaceDetails';
+import { COLORS } from '../../../constants/theme';
 
 const Stack = createStackNavigator<PetFriendlyPlacesStackParamList>();
 
 const PetFriendlyPlacesStack = () => {
   return (
-    <Stack.Navigator>
+    <Stack.Navigator
+    screenOptions={{
+      headerTitleStyle: { color: COLORS.primary},
+      headerTintColor: COLORS.primary,
+  }}
+    >
       <Stack.Screen
         name="PlacesList"
         component={PlacesList}

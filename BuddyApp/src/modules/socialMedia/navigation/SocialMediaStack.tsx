@@ -5,12 +5,18 @@ import CreatePost from '../screens/CreatePostScreen/CreatePostScreen';
 import FeedScreen from '../screens/FeedScreen/FeedScreen';
 import SocialProfile from '../screens/SocialProfileScreen/SocialProfileScreen';
 import { SocialMediaStackParamList } from './NavigationTypes';
+import { COLORS } from '../../../constants/theme';
 
 const Stack = createStackNavigator<SocialMediaStackParamList>();
 
 const SocialMediaStack = () => {
     return (
-        <Stack.Navigator>
+        <Stack.Navigator
+            screenOptions={{
+                headerTitleStyle: { color: COLORS.primary},
+                headerTintColor: COLORS.primary,
+        }}
+        >
             <Stack.Screen
                 name="Feed"
                 component={FeedScreen}

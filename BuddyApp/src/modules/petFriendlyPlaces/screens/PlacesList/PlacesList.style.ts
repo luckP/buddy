@@ -1,4 +1,5 @@
 import { StyleSheet } from 'react-native';
+import { COLORS } from '../../../../constants/theme';
 
 export default StyleSheet.create({
   container: {
@@ -27,7 +28,7 @@ export default StyleSheet.create({
     backgroundColor: '#f0f0f0',
   },
   activeButton: {
-    backgroundColor: '#007AFF', // iOS blue style
+    backgroundColor: COLORS.primary, // iOS blue style
   },
   toggleButtonText: {
     color: '#fff',
@@ -71,38 +72,43 @@ export default StyleSheet.create({
     fontSize: 14,
     color: '#666',
   },
+
   markerWrapper: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    width: 80,
-    height: 80,
+    alignItems: "center",
+    justifyContent: "center",
+    width: 70,
+    height: 70,
   },
   markerImageContainer: {
     width: 50,
     height: 50,
-    borderRadius: 25,
-    borderWidth: 2,
-    borderColor: '#007AFF',
-    backgroundColor: '#fff',
-    overflow: 'hidden',
+    borderRadius: 8, // Slight rounding for square markers
+    borderWidth: 3, // Makes it pop
+    borderColor: COLORS.primary, // Primary theme color for border
+    backgroundColor: COLORS.white,
+    overflow: "hidden",
+    alignItems: "center",
+    justifyContent: "center",
   },
   markerImage: {
-    width: '100%',
-    height: '100%',
+    width: "100%",
+    height: "100%",
+    borderRadius: 8, // Ensures image is also rounded properly
   },
   markerLabelContainer: {
-    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    backgroundColor: "rgba(0, 0, 0, 0.7)",
     paddingHorizontal: 6,
     paddingVertical: 3,
     borderRadius: 5,
-    position: 'absolute',
-    bottom: 2,
+    position: "absolute",
+    bottom: 0, // Moves it down a bit for better alignment
     maxWidth: 80,
   },
   markerLabelText: {
     fontSize: 10,
-    fontWeight: 'bold',
-    color: '#fff',
-    textAlign: 'center',
+    fontWeight: "bold",
+    color: COLORS.white,
+    textAlign: "center",
   },
+
 });

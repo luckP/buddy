@@ -34,28 +34,31 @@ const LostFoundMainScreen = ({ navigation }: { navigation: any }) => {
   const debounceTimeout = useRef<NodeJS.Timeout | null>(null);
   const lastRetrievedLocation = useRef({ latitude: 0, longitude: 0 });
 
+
+  useFocusEffect(
+    useCallback(() => {
+      console.log("useFocusEffect called");
+      getUserLocation();
+    }, [])
+  );
+
   /**
    * Fetch user location and center the map when screen is focused
    */
   const getUserLocation = async () => {
-    
     Geolocation.getCurrentPosition(
       (position) => {
         const { latitude, longitude } = position.coords;
         setUserLocation({ latitude, longitude });
         setTargetLocation({ latitude, longitude });
 
-        console.log('DEBUG getUserLocation', new Date(), mapRef);
-        if (mapRef.current && mapReady) {
-          // mapRef.current.animateToRegion({
-          //   latitude,
-          //   longitude,
-          //   latitudeDelta: 0.05,
-          //   longitudeDelta: 0.05,
-          // });
-        }
-        else{
-          // setTimeout(() => getUserLocation(), 1000)
+        if (mapRef.current) {
+          mapRef.current.animateToRegion({
+            latitude,
+            longitude,
+            latitudeDelta: 0.05,
+            longitudeDelta: 0.05,
+          });
         }
 
         retrieveReports(latitude, longitude);
@@ -74,7 +77,6 @@ const LostFoundMainScreen = ({ navigation }: { navigation: any }) => {
   const retrieveReports = useCallback(async (latitude: number, longitude: number) => {
     try {
       const fetchedReports = await getReports(latitude, longitude);
-
       setReports(fetchedReports);
       lastRetrievedLocation.current = { latitude, longitude };
     } catch (error) {
@@ -87,7 +89,6 @@ const LostFoundMainScreen = ({ navigation }: { navigation: any }) => {
    * Handle when the map stops moving
    */
   const handleRegionChangeComplete = useCallback((region: Region) => {
-    console.log('DEBUG handleRegionChangeComplete', new Date());
     const distanceMoved = Math.sqrt(
       Math.pow(region.latitude - lastRetrievedLocation.current.latitude, 2) +
       Math.pow(region.longitude - lastRetrievedLocation.current.longitude, 2)
@@ -106,13 +107,12 @@ const LostFoundMainScreen = ({ navigation }: { navigation: any }) => {
   }, [retrieveReports]);
 
   /**
-   * Run when screen loads and when screen is focused
+   * Run when map is ready
    */
-  useFocusEffect(
-    useCallback(() => {
-      getUserLocation();
-    }, [])
-  );
+  const handleMapReady = () => {
+    setMapReady(true);
+    getUserLocation();
+  };
 
   /**
    * Open report details when a marker is clicked
@@ -120,11 +120,12 @@ const LostFoundMainScreen = ({ navigation }: { navigation: any }) => {
   const handleMarkerPress = (report: LostAndFoundReport) => {
     setSelectedReport(report);
   };
+  
 
   return (
     <View style={styles.container}>
       {/* Map View */}
-      {<MapView
+      <MapView
         ref={mapRef}
         provider={PROVIDER_GOOGLE}
         style={styles.map}
@@ -135,38 +136,35 @@ const LostFoundMainScreen = ({ navigation }: { navigation: any }) => {
           longitudeDelta: 0.05,
         }}
         onRegionChangeComplete={handleRegionChangeComplete}
-        onMapReady={() => {
-          setMapReady(true);
-          
-        }}
+        onMapReady={handleMapReady}
         showsUserLocation={true}
       >
         {/* Lost and Found Reports Markers */}
-        {userLocation.latitude!=0 && reports.map((report) => (
-          <Marker
-            key={report.id}
-            coordinate={{
-              latitude: report.location.coordinates[1], // GeoJSON [longitude, latitude]
-              longitude: report.location.coordinates[0],
-            }}
-            onPress={() => handleMarkerPress(report)}
-          >
-            {/* Custom Marker View */}
-            <View style={styles.customMarker}>
-              {report.images?.length > 0 ? (
-                <>
-                <Text>{report.images[0]}</Text>
-                <Image source={{ uri: report.images[0] }} style={styles.markerImage} />
-                </>
-              ) : (
-                <View style={styles.noImageMarker}>
-                  <Text style={styles.markerText}>{report.status.toUpperCase()}</Text>
-                </View>
-              )}
-            </View>
-          </Marker>
-        ))}
-      </MapView>}
+        {userLocation.latitude !== 0 &&
+          reports.map((report) => (
+            <Marker
+              key={report.id}
+              coordinate={{
+                latitude: report.location.coordinates[1], // GeoJSON [longitude, latitude]
+                longitude: report.location.coordinates[0],
+              }}
+              onPress={() => handleMarkerPress(report)}
+            >
+              {/* Custom Marker View */}
+              <View style={styles.customMarker}>
+                {report.images?.length > 0 ? (
+                  <>
+                    <Image source={{ uri: report.images[0] }} style={styles.markerImage} />
+                  </>
+                ) : (
+                  <View style={styles.noImageMarker}>
+                    <Text style={styles.markerText}>{report.status.toUpperCase()}</Text>
+                  </View>
+                )}
+              </View>
+            </Marker>
+          ))}
+      </MapView>
 
       {/* Target Marker */}
       <TargetMarker />

@@ -35,7 +35,7 @@ const ReportLostPet = ({ navigation, route }: { navigation: any; route: any }) =
     Geolocation.getCurrentPosition(
       (position) => {
         const { latitude, longitude } = position.coords;
-        // setLocation({ latitude, longitude });
+        setLocation({ latitude, longitude });
         setUserLocationLoaded(true);
       },
       (error) => {
