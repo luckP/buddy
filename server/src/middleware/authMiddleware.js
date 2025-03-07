@@ -1,6 +1,6 @@
 import admin from 'firebase-admin';
 import User from '../models/userSchema.js'; // Ensure correct path
-import { ensureUserUploadDirectory } from '../utils/upload.js';
+import { ensurPostsUploadDirectory } from '../utils/upload.js';
 
 
 /**
@@ -46,7 +46,7 @@ export const authenticateUser = async (req, res, next) => {
 
 
         if (user) {
-            ensureUserUploadDirectory(user._id.toString()); // ✅ Ensure user folder is created
+            ensurPostsUploadDirectory(user._id.toString()); // ✅ Ensure user folder is created
         }
 
         // ✅ Attach the user from MongoDB to `req.user`

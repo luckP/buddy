@@ -8,7 +8,7 @@ import { v4 as uuidv4 } from 'uuid';
  * @param {string} userId - The MongoDB user ID
  * @returns {string} Path to the user's upload directory
  */
-export const ensureUserUploadDirectory = (userId) => {
+export const ensurPostsUploadDirectory = (userId) => {
     const userUploadDir = path.join(process.cwd(), 'src/uploads/posts', userId);
     if (!fs.existsSync(userUploadDir)) {
         fs.mkdirSync(userUploadDir, { recursive: true });
@@ -41,10 +41,12 @@ const storage = multer.diskStorage({
 
         // ✅ Determine upload directory based on the request route
         let uploadDir;
-        if (req.baseUrl.includes('/lostFoundPets')) {
+        if (req.baseUrl.includes('/lostFoundPets')) { 
             uploadDir = ensureLostFoundPetsDirectory(userId);
+        } else if (req.baseUrl.includes('/posts')) { 
+            uploadDir = ensurPostsUploadDirectory(userId);
         } else {
-            uploadDir = ensureUserUploadDirectory(userId);
+            return cb(new Error("Invalid upload path"), null);
         }
 
         console.log(`🟢 DEBUG: Uploading image to directory: ${uploadDir}`);

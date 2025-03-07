@@ -1,21 +1,14 @@
+import { API_BASE_URL } from '../config/constants.js';
 import PetFriendlyPlace from '../models/petFriendlyPlaceSchema.js';
 
 /**
  * @route   POST /api/pet-friendly-places
  * @desc    Create a pet-friendly place entry
  * @access  Private
- * @param   {Object} req - Express request object
- * @param   {Object} req.body - Request payload
- * @param   {string} req.body.name - Name of the place
- * @param   {string} req.body.description - Short description
- * @param   {Array} req.body.images - Array of image URLs
- * @param   {Object} req.body.location - GeoJSON object with `type` and `coordinates`
- * @param   {Object} res - Express response object
- * @returns {Object} JSON response with created place entry
  */
 export const createPetFriendlyPlace = async (req, res) => {
   try {
-    const { name, description, images, location } = req.body;
+    const { name, description, images, location, category } = req.body;
 
     if (!location || !location.type || !location.coordinates) {
       return res.status(400).json({ error: 'Location is required and must be a valid GeoJSON Point.' });
@@ -25,7 +18,8 @@ export const createPetFriendlyPlace = async (req, res) => {
       name,
       description,
       images,
-      location
+      location,
+      category
     });
 
     await petPlace.save();
@@ -38,31 +32,21 @@ export const createPetFriendlyPlace = async (req, res) => {
 
 /**
  * @route   GET /api/pet-friendly-places
- * @desc    Get all pet-friendly places (with optional geolocation filtering)
+ * @desc    Get all active pet-friendly places
  * @access  Public
- * @param   {Object} req - Express request object
- * @param   {Object} req.query - Query parameters
- * @param   {number} req.query.lat - Latitude for filtering
- * @param   {number} req.query.lng - Longitude for filtering
- * @param   {number} req.query.radius - Search radius in kilometers
- * @param   {Object} res - Express response object
- * @returns {Array} JSON response with list of places
  */
 export const getPetFriendlyPlaces = async (req, res) => {
   try {
-    const { lat, lng, radius } = req.query;
-    let query = {};
 
-    if (lat && lng && radius) {
-      query.location = {
-        $geoWithin: {
-          $centerSphere: [[parseFloat(lng), parseFloat(lat)], parseFloat(radius) / 6378.1] // Earth's radius in km
-        }
-      };
-    }
+    const places = await PetFriendlyPlace.find({ is_deleted: false }).sort({ created_at: -1 });
 
-    const places = await PetFriendlyPlace.find(query).sort({ createdAt: -1 });
-    res.json(places);
+    // ✅ Format image URLs correctly
+    const formattedPlaces = places.map(place => ({
+      ...place.toObject(),
+      images: place.images.map(imgPath => `${API_BASE_URL}${imgPath}`) // Append base URL for images
+    }));
+
+    res.json(formattedPlaces);
   } catch (error) {
     console.error('Error retrieving pet-friendly places:', error);
     res.status(500).json({ error: 'Something went wrong.' });
@@ -73,14 +57,10 @@ export const getPetFriendlyPlaces = async (req, res) => {
  * @route   GET /api/pet-friendly-places/:id
  * @desc    Get a single pet-friendly place by ID
  * @access  Public
- * @param   {Object} req - Express request object
- * @param   {string} req.params.id - Place ID
- * @param   {Object} res - Express response object
- * @returns {Object} JSON response with place details
  */
 export const getPetFriendlyPlaceById = async (req, res) => {
   try {
-    const place = await PetFriendlyPlace.findById(req.params.id);
+    const place = await PetFriendlyPlace.findOne({ _id: req.params.id, is_deleted: false });
 
     if (!place) {
       return res.status(404).json({ error: 'Place not found.' });
@@ -95,19 +75,18 @@ export const getPetFriendlyPlaceById = async (req, res) => {
 
 /**
  * @route   PUT /api/pet-friendly-places/:id
- * @desc    Update a pet-friendly place (Only by authorized users)
+ * @desc    Update a pet-friendly place
  * @access  Private
- * @param   {Object} req - Express request object
- * @param   {string} req.params.id - Place ID
- * @param   {Object} req.body - Updated place data
- * @param   {Object} res - Express response object
- * @returns {Object} JSON response with updated place
  */
 export const updatePetFriendlyPlace = async (req, res) => {
   try {
-    const updatedPlace = await PetFriendlyPlace.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    const updatedPlace = await PetFriendlyPlace.findByIdAndUpdate(
+      req.params.id,
+      { ...req.body, updated_at: Date.now() },
+      { new: true }
+    );
 
-    if (!updatedPlace) {
+    if (!updatedPlace || updatedPlace.is_deleted) {
       return res.status(404).json({ error: 'Place not found.' });
     }
 
@@ -119,23 +98,53 @@ export const updatePetFriendlyPlace = async (req, res) => {
 };
 
 /**
- * @route   DELETE /api/pet-friendly-places/:id
- * @desc    Delete a pet-friendly place
+ * @route   PUT /api/pet-friendly-places/:id/status
+ * @desc    Update the `is_active` status of a place
  * @access  Private
- * @param   {Object} req - Express request object
- * @param   {string} req.params.id - Place ID
- * @param   {Object} res - Express response object
- * @returns {Object} JSON response with deletion confirmation
+ */
+export const updatePlaceStatus = async (req, res) => {
+  try {
+    const { is_active } = req.body;
+
+    if (typeof is_active !== 'boolean') {
+      return res.status(400).json({ error: 'is_active must be a boolean value.' });
+    }
+
+    const updatedPlace = await PetFriendlyPlace.findByIdAndUpdate(
+      req.params.id,
+      { is_active, updated_at: Date.now() },
+      { new: true }
+    );
+
+    if (!updatedPlace || updatedPlace.is_deleted) {
+      return res.status(404).json({ error: 'Place not found.' });
+    }
+
+    res.json(updatedPlace);
+  } catch (error) {
+    console.error('Error updating place status:', error);
+    res.status(500).json({ error: 'Something went wrong.' });
+  }
+};
+
+/**
+ * @route   DELETE /api/pet-friendly-places/:id
+ * @desc    Soft delete a pet-friendly place
+ * @access  Private
  */
 export const deletePetFriendlyPlace = async (req, res) => {
   try {
-    const deletedPlace = await PetFriendlyPlace.findByIdAndDelete(req.params.id);
+    const deletedPlace = await PetFriendlyPlace.findByIdAndUpdate(
+      req.params.id,
+      { is_deleted: true, updated_at: Date.now() },
+      { new: true }
+    );
 
     if (!deletedPlace) {
       return res.status(404).json({ error: 'Place not found.' });
     }
 
-    res.json({ message: 'Place deleted successfully.' });
+    res.json({ message: 'Place deleted successfully (soft delete).' });
   } catch (error) {
     console.error('Error deleting pet-friendly place:', error);
     res.status(500).json({ error: 'Something went wrong.' });

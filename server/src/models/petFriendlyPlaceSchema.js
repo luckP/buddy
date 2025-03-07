@@ -1,36 +1,44 @@
 import mongoose from 'mongoose';
 
-const PetFriendlyPlaceSchema = new mongoose.Schema(
-  {
-    name: { type: String, required: true }, // Place name
-    description: { type: String, required: true }, // Short description
-    images: [{ type: String }], // Array of image URLs
+const RatingSchema = new mongoose.Schema({
+  user_id: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+  rating: { type: Number, required: true, min: 1, max: 5 },
+  comment: { type: String, required: false },
+  timestamp: { type: Date, default: Date.now }
+});
 
-    // Geolocation (GeoJSON format)
-    location: {
-      type: {
-        type: String,
-        enum: ['Point'],
-        required: true
-      },
-      coordinates: {
-        type: [Number], // [longitude, latitude]
-        required: true
-      }
-    },
-
-    // User interactions
-    likes: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }], // Users who liked
-    comments: [{ type: mongoose.Schema.Types.ObjectId, ref: 'PetPlaceComment' }], // Comments on the place
-
-    // Optional rating (1-5 stars system)
-    averageRating: { type: Number, default: 0 },
-    ratingCount: { type: Number, default: 0 }
+const PetFriendlyPlaceSchema = new mongoose.Schema({
+  name: { type: String, required: true },
+  description: { type: String, required: true },
+  address: { type: String, required: true },
+  phone: { type: String },
+  website: { type: String },
+  category: {
+    type: String,
+    required: true,
+    enum: ['Park', 'Cafe', 'Restaurant', 'Hotel', 'Store', 'Other']
   },
-  { timestamps: true }
-);
+  images: { type: [String], default: [] },
+  location: {
+    type: {
+      type: String,
+      enum: ['Point'],
+      default: 'Point'
+    },
+    coordinates: {
+      type: [Number], // [longitude, latitude]
+      required: true
+    }
+  },
+  is_active: { type: Boolean, default: true }, // ✅ Field to indicate if the place is active
+  is_deleted: { type: Boolean, default: false }, // ✅ Soft delete field
+  user_ratings: { type: [RatingSchema], default: [] },
+  average_rating: { type: Number, default: 0 },
+  created_at: { type: Date, default: Date.now },
+  updated_at: { type: Date, default: Date.now }
+});
 
-// Index for geospatial queries
+// ** Create Geospatial Index **
 PetFriendlyPlaceSchema.index({ location: '2dsphere' });
 
 export default mongoose.model('PetFriendlyPlace', PetFriendlyPlaceSchema);

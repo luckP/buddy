@@ -34,20 +34,9 @@ export const createLostFoundPet = async (req, res) => {
       return res.status(400).json({ error: "Location is required and must be a valid GeoJSON Point." });
     }
 
-    // Define user directory
-    const userUploadsPath = path.join(process.cwd(), `uploads/lostFoundPets/${req.user._id}/`);
-    if (!fs.existsSync(userUploadsPath)) {
-      fs.mkdirSync(userUploadsPath, { recursive: true });
-    }
 
     // Move uploaded files to the correct folder
-    const imageUrls = req.files?.map(file => {
-      const newFilePath = path.join(userUploadsPath, file.filename);
-      fs.renameSync(file.path, newFilePath); // Move file to the correct folder
-      return `/uploads/lostFoundPets/${req.user._id}/${file.filename}`;
-    }) || [];
-
-    console.log("🟢 DEBUG: Image URLs stored in DB:", imageUrls);
+    const imageUrls = req.files?.map(file => `/uploads/lostFoundPets/${req.user._id.toString()}/${file.filename}`) || [];
 
     // Create and save the new report
     const lostFoundPet = new LostFoundPet({

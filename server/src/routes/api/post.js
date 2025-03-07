@@ -8,7 +8,7 @@ import {
     getFeedPosts
 } from '../../controllers/postController.js';
 import { authenticateUser } from '../../middleware/authMiddleware.js';
-import upload from '../../utils/upload.js'; // ✅ Import Multer from `upload.js`
+import upload from '../../utils/upload.js';
 
 const router = express.Router();
 
