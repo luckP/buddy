@@ -20,7 +20,10 @@ docker-compose.override.yml
 
 # Ignore build output
 /server/dist
-/server/src/upload
+
+# Ignore the upload/folder
+/server/src/uploads/
+
 
 # Ignore specific files in Android and iOS folders
 /BuddyApp/android/.gradle

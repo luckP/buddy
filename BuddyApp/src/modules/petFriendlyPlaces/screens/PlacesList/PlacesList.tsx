@@ -9,15 +9,16 @@ import {
 } from 'react-native';
 import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 import styles from './PlacesList.style';
-import Geolocation from '@react-native-community/geolocation';
 import { fetchPlaces } from '../../services/placesService';
+import { getUserLocation, Location } from '../../../../utils/locationUtils';
+
 
 const PlacesList = ({ navigation }: any) => {
   const [places, setPlaces] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [showMap, setShowMap] = useState(true); // Toggle between map and list
   const [filteredPlaces, setFilteredPlaces] = useState([]);
-  const [currentLocation, setCurrentLocation] = useState({
+  const [currentLocation, setCurrentLocation] = useState<Location>({
     latitude: 0,
     longitude: 0,
     latitudeDelta: 0.05,
@@ -25,59 +26,74 @@ const PlacesList = ({ navigation }: any) => {
   });
   const [locationLoaded, setLocationLoaded] = useState(false);
 
-  const getUserLocation = () => {
-    Geolocation.getCurrentPosition(
-      async (position) => {
-        const { latitude, longitude } = position.coords;
-        setCurrentLocation({
-          latitude,
-          longitude,
-          latitudeDelta: 0.05,
-          longitudeDelta: 0.05,
-        });
-        setLocationLoaded(true);
-
-        console.log('User location:', latitude, longitude);
-
-        // Fetch places from the backend
-        try {
-          const data: any = await fetchPlaces(latitude, longitude).then();
-          setPlaces(data);
-          setFilteredPlaces(data);
-        } catch (error) {
-          console.error('Error loading places:', error);
-        }
-      },
-      (error) => {
-        console.error('Error retrieving user location:', error);
-        setLocationLoaded(true); // Allow rendering even if location fails
-      },
-      { enableHighAccuracy: true, timeout: 20000, maximumAge: 1000 }
-    );
-  };
-
+  /**
+   * Loads the user's location and nearby pet-friendly places when the component mounts.
+   * This effect runs only once when the component is mounted.
+   *
+   * @returns {void}
+   */
   useEffect(() => {
-    getUserLocation();
+    loadLocationAndPlaces();
   }, []);
 
+  /**
+   * Loads the user's current location and nearby pet-friendly places.
+   * First retrieves the user's geolocation coordinates using getUserLocation(),
+   * then updates the currentLocation state and locationLoaded flag.
+   * Finally fetches nearby places based on the user's coordinates and
+   * updates both the places and filteredPlaces states.
+   *
+   * @throws {Error} If there's an error getting location or fetching places
+   * @returns {Promise<void>}
+   */
+  const loadLocationAndPlaces = async () => {
+    try {
+      const location = await getUserLocation();
+      setCurrentLocation(location);
+      setLocationLoaded(true);
+
+      console.log('User location:', location.latitude, location.longitude);
+
+      const data = await fetchPlaces(location.latitude, location.longitude);
+      setPlaces(data);
+      setFilteredPlaces(data);
+    } catch (error) {
+      console.error('Error loading location or places:', error);
+      setLocationLoaded(true);
+    }
+  };
+
+  /**
+   * Handles the search functionality by filtering the places based on the search term.
+   * If the search term is empty, it shows all places.
+   * Otherwise, it filters the places to only include those whose names contain the search term.
+   * 
+   * @param {string} text - The search term to filter the places by
+   **/
   const handleSearch = (text: string) => {
     setSearchTerm(text);
     if (text.trim() === '') {
       setFilteredPlaces(places);
     } else {
       const filtered = places.filter((place: any) =>
-        place.name.toLowerCase().includes(text.toLowerCase())
+        place.name.toLowerCase().includes(text.toLowerCase()),
       );
       setFilteredPlaces(filtered);
     }
   };
 
-  const renderListItem = ({ item }: { item: any }) => (
+
+  /**
+   * Renders a list item for a place.
+   * 
+   * @param {Object} item - The place object to render
+   * @returns {React.ReactNode} The rendered list item
+   */
+  const renderListItem = ({item}: {item: any}) => (
     <TouchableOpacity
       style={styles.listItem}
-      onPress={() => navigation.navigate('PlaceDetails', { place: item })}
-    >
-      <Image source={{ uri: item.images[0] }} style={styles.listItemImage} />
+      onPress={() => navigation.navigate('PlaceDetails', {place: item})}>
+      <Image source={{uri: item.images[0]}} style={styles.listItemImage} />
       <View style={styles.listItemContent}>
         <Text style={styles.listItemTitle}>{item.name}</Text>
         <Text style={styles.listItemDescription} numberOfLines={2}>
@@ -99,18 +115,16 @@ const PlacesList = ({ navigation }: any) => {
         />
         <TouchableOpacity
           style={[styles.toggleButton, showMap && styles.activeButton]}
-          onPress={() => setShowMap(true)}
-        >
+          onPress={() => setShowMap(true)}>
           <Text style={styles.toggleButtonText}>Map</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={[styles.toggleButton, !showMap && styles.activeButton]}
-          onPress={() => setShowMap(false)}
-        >
+          onPress={() => setShowMap(false)}>
           <Text style={styles.toggleButtonText}>List</Text>
         </TouchableOpacity>
       </View>
-  
+
       {/* Map or List View */}
       {locationLoaded ? (
         showMap ? (
@@ -118,8 +132,7 @@ const PlacesList = ({ navigation }: any) => {
             provider={PROVIDER_GOOGLE}
             style={styles.map}
             region={currentLocation}
-            showsUserLocation={true}
-          >
+            showsUserLocation={true}>
             {filteredPlaces.map((place: any) => (
               <Marker
                 key={place._id}
@@ -127,14 +140,11 @@ const PlacesList = ({ navigation }: any) => {
                   latitude: place.location.coordinates[1], // GeoJSON stores [lng, lat]
                   longitude: place.location.coordinates[0],
                 }}
-                onPress={() =>
-                  navigation.navigate('PlaceDetails', { place })
-                }
-              >
+                onPress={() => navigation.navigate('PlaceDetails', {place})}>
                 <View style={styles.markerWrapper}>
                   <View style={styles.markerImageContainer}>
                     <Image
-                      source={{ uri: place.images[0] }}
+                      source={{uri: place.images[0]}}
                       style={styles.markerImage}
                     />
                   </View>
@@ -156,9 +166,7 @@ const PlacesList = ({ navigation }: any) => {
           />
         )
       ) : (
-        <Text style={{ textAlign: 'center', marginTop: 20 }}>
-          Loading map...
-        </Text>
+        <Text style={styles.loadingText}>Loading map...</Text>
       )}
     </View>
   );

@@ -110,5 +110,9 @@ export default StyleSheet.create({
     color: COLORS.white,
     textAlign: "center",
   },
+  loadingText: {
+    textAlign: 'center',
+    marginTop: 20,
+  },
 
 });

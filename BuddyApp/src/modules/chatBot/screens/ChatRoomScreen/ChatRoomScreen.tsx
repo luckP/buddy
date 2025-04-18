@@ -7,21 +7,33 @@ import {
   FlatList,
   Alert,
   ActivityIndicator,
-  StyleSheet,
+  KeyboardAvoidingView,
+  Platform,
 } from "react-native";
+import Icon from 'react-native-vector-icons/Feather';
 import { fetchChatMessages, createNewChat, createNewMessage } from "../../services/chatService";
 import IaChatMessage from "../../../../models/IaChatMessage";
+import { ChatRole } from "../../../../models/ChatRole";
+import styles from "./ChatRoomScreen.style";
+import { IA_PROMPT_TEXT } from "../../constants/iaPromptText";
+import { COLORS } from "../../../../constants/theme";
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
-const ChatroomScreen = ({ route, navigation }: { route: any; navigation: any }) => {
+
+const ChatroomScreen = ({ route }: { route: any; navigation: any }) => {
   const { chatId: initialChatId, isNewChat } = route.params;
   const [chatId, setChatId] = useState<string | null>(initialChatId || null);
-  // const [messages, setMessages] = useState<IaChatMessage[]>([]);
-  const [messages, setMessages] = useState<IaChatMessage[]>(Array(100).fill(null).map((_, i) => ({ role: "user", prompt: "test new message" + i})));
-  const [inputText, setInputText] = useState("");
+  const [messages, setMessages] = useState<IaChatMessage[]>([]);
+  const [inputText, setInputText] = useState('');
   const [loading, setLoading] = useState(false);
   const [isReadOnly, setIsReadOnly] = useState(!isNewChat);
+  const [showScrollToBottom, setShowScrollToBottom] = useState(false);
 
-  const flatListRef = useRef<FlatList<IaChatMessage>>(null); // ✅ For auto-scroll
+
+  const flatListRef = useRef<FlatList<IaChatMessage>>(null);
+
+  const insets = useSafeAreaInsets();
+
 
 
   /**
@@ -32,6 +44,9 @@ const ChatroomScreen = ({ route, navigation }: { route: any; navigation: any }) 
     try {
       const chatMessages = await fetchChatMessages(chatId);
       setMessages(chatMessages);
+      setTimeout(() => {
+        scrollToBottom();
+      }, 100);
     } catch (error) {
       console.error("Error fetching chat messages:", error);
       Alert.alert("Erro", "Não foi possível carregar as mensagens.");
@@ -42,57 +57,91 @@ const ChatroomScreen = ({ route, navigation }: { route: any; navigation: any }) 
    * Sends a message and updates the UI when the response arrives.
    */
   const handleSendMessage = async () => {
-    if (!inputText.trim()) return;
+    const trimmedInput = inputText.trim();
+    if (!trimmedInput) {
+      return;
+    }
 
     setLoading(true);
 
     try {
-      let response;
-      let newChatId = chatId;
-      const updatedMessages: IaChatMessage[] = [...messages];
+      const updatedMessages = addUserMessage(trimmedInput);
+      clearInput();
 
-      const userMessage: IaChatMessage = { role: "user", prompt: inputText };
-      updatedMessages.push(userMessage);
+      const newChatId = await getOrCreateChatId(chatId, trimmedInput);
+      setChatId(newChatId);
 
-      // Update UI with user's message
-      setMessages(updatedMessages);
+      const response = await createNewMessage(newChatId, trimmedInput);
 
-      if (!chatId) {
-        response = await createNewChat(inputText);
-        newChatId = response.chatId;
-        setChatId(newChatId);
-      } else {
-        response = await createNewMessage(chatId, inputText);
+      if (response?.reply) {
+        addAssistantReply(response.reply, updatedMessages);
       }
 
-      setInputText("");
-
-      if (response.reply) {
-        const assistantMessage: IaChatMessage = { role: "assistant", prompt: response.reply };
-        updatedMessages.push(assistantMessage);
-
-        // Append AI response while keeping all previous messages
-        setMessages(updatedMessages);
-        setTimeout(() => {
-          flatListRef.current?.scrollToEnd({ animated: true });
-        }, 100);
-      }
     } catch (error) {
-      console.error("Error sending message:", error);
-      Alert.alert("Erro", "Não foi possível enviar a mensagem.");
+      console.error('Error sending message:', error);
+      Alert.alert('Erro', 'Não foi possível enviar a mensagem.');
     } finally {
       setLoading(false);
-      // ✅ Scroll to the latest message when assistant responds
-      
     }
   };
+
+  /**
+   * Adds a user message to the chat messages.
+   *
+   * @param prompt - The message text.
+   * @returns The updated list of messages.
+   */
+  const addUserMessage = (prompt: string): IaChatMessage[] => {
+    const userMessage: IaChatMessage = { role: ChatRole.User, prompt };
+    const newMessages = [...messages, userMessage];
+    setMessages(newMessages);
+    return newMessages;
+  };
+
+  /**
+   * Creates a new chat or returns the existing one.
+   */
+  const getOrCreateChatId = async (existingId: string | null, prompt: string): Promise<string> => {
+    if (existingId) return existingId;
+
+    const response = await createNewChat(prompt);
+    return response.chatId;
+  };
+
+  /**
+   * Adds the assistant's reply to the chat messages.
+   *
+   * @param reply - The assistant's reply.
+   * @param previousMessages - The previous messages in the chat.
+   */
+  const addAssistantReply = (reply: string, previousMessages: IaChatMessage[]) => {
+    const assistantMessage: IaChatMessage = { role: ChatRole.Assistant, prompt: reply };
+    const finalMessages = [...previousMessages, assistantMessage];
+    setMessages(finalMessages);
+    scrollToBottom();
+  };
+
+  /**
+   * Scrolls to the bottom of the chat list.
+   */
+  const scrollToBottom = () => {
+    setTimeout(() => flatListRef.current?.scrollToEnd({ animated: true }), 100);
+  };
+
+  /**
+   * Clears the input field.
+   */
+  const clearInput = () => {
+    setInputText('');
+  };
+
 
   /**
    * Initializes a new chat session with a stored AI response.
    */
   useEffect(() => {
     if (isNewChat) {
-      // setMessages([{ role: "assistant", prompt: "Olá! Como posso ajudar com seu animal de estimação hoje?" }]);
+      setMessages([{ role: ChatRole.Assistant, prompt: IA_PROMPT_TEXT }]);
     } else {
       fetchMessages();
     }
@@ -105,61 +154,76 @@ const ChatroomScreen = ({ route, navigation }: { route: any; navigation: any }) 
     if (chatId && !isNewChat) {
       setIsReadOnly(true);
     }
-  }, [chatId]);
+  }, [chatId, isNewChat]);
 
 
-  const screollEnd = () => {
-    flatListRef.current?.scrollToEnd({ animated: true });
-  }
+  /**
+   * On FlatList scroll, show or hide the scroll-to-bottom button.
+   */
+  const handleScroll = useCallback(({ nativeEvent }: any) => {
+    const isAtBottom = nativeEvent.layoutMeasurement.height + nativeEvent.contentOffset.y >= nativeEvent.contentSize.height - 20;
+    setShowScrollToBottom(!isAtBottom);
+  }, []);
 
   return (
-    <View style={styles.container}>
-      <TouchableOpacity style={{backgroundColor: 'red', padding: 30}} onPress={screollEnd}>
-          <Text>Press Here to test screoll</Text>
-        </TouchableOpacity>
-      <FlatList
-        data={messages}
-        keyExtractor={(_, index) => index.toString()}
-        renderItem={({ item }) => (
-          <View style={[styles.messageBubble, item.role === "user" ? styles.userMessage : styles.assistantMessage]}>
-            <Text style={styles.messageText}>{item.prompt}</Text>
+    <SafeAreaView 
+    style={styles.safeArea}
+    edges={['left', 'right', 'bottom']}
+    >
+      <KeyboardAvoidingView
+        style={styles.container}
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
+        keyboardVerticalOffset={90}
+      >
+        <FlatList
+          data={messages}
+          ref={flatListRef}
+          keyExtractor={(_, index) => index.toString()}
+          onScroll={handleScroll}
+          scrollEventThrottle={100}
+          contentContainerStyle={styles.flatListContent}
+          renderItem={({ item }) => (
+            <View style={[
+              styles.messageBubble,
+              item.role === ChatRole.User ? styles.userMessage : styles.assistantMessage
+            ]}>
+              <Text style={styles.messageText}>{item.prompt}</Text>
+            </View>
+          )}
+        />
+
+        {showScrollToBottom && (
+          <TouchableOpacity style={styles.scrollToBottomButton} onPress={scrollToBottom}>
+            <Icon name="chevron-down" size={28} color={COLORS.white} />
+          </TouchableOpacity>
+        )}
+
+        {loading && <ActivityIndicator size="large" color={COLORS.primary} style={styles.loadingIndicator} />}
+
+        {(!isReadOnly || true) && (
+          <View style={[styles.inputContainer,  { paddingBottom: insets.bottom || 10 }]}>
+            <TextInput
+              style={styles.textInput}
+              value={inputText}
+              onChangeText={setInputText}
+              placeholder="Escreva sua mensagem..."
+              editable={!loading}
+              multiline
+              numberOfLines={1}
+              textAlignVertical="top"
+              maxLength={200}
+            />
+            <TouchableOpacity style={styles.voiceButton} onPress={() => console.log('Start voice input')} disabled={loading}>
+              <Icon name="mic" size={24} color={COLORS.white} />
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.sendButton} onPress={handleSendMessage} disabled={loading}>
+              <Icon name="send" size={20} color={COLORS.white} />
+            </TouchableOpacity>
           </View>
         )}
-      />
-
-      {loading && <ActivityIndicator size="large" color="#1E90FF" style={styles.loadingIndicator} />}
-
-      {/* Disable input if chat is closed */}
-      {!isReadOnly && (
-        <View style={styles.inputContainer}>
-          <TextInput
-            style={styles.textInput}
-            value={inputText}
-            onChangeText={setInputText}
-            placeholder="Escreva sua mensagem..."
-          />
-          <TouchableOpacity style={styles.sendButton} onPress={handleSendMessage} disabled={loading}>
-            <Text style={styles.sendButtonText}>Enviar</Text>
-          </TouchableOpacity>
-        </View>
-      )}
-    </View>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 };
 
 export default ChatroomScreen;
-
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#fff" },
-  messageBubble: { marginVertical: 5, padding: 10, borderRadius: 10, maxWidth: "80%" },
-  userMessage: { backgroundColor: "#DCF8C6", alignSelf: "flex-end" },
-  assistantMessage: { backgroundColor: "#F1F1F1" },
-  messageText: { fontSize: 16 },
-  inputContainer: { flexDirection: "row", padding: 10, borderTopWidth: 1, borderTopColor: "#ccc" },
-  textInput: { flex: 1, borderWidth: 1, borderColor: "#ccc", borderRadius: 8, padding: 10, marginRight: 10 },
-  sendButton: { backgroundColor: "#1E90FF", padding: 10, borderRadius: 8 },
-  sendButtonDisabled: { backgroundColor: "#ccc" },
-  sendButtonText: { color: "#fff", fontWeight: "bold" },
-  backButton: { color: "#1E90FF", fontSize: 16, paddingLeft: 10 },
-  loadingIndicator: { marginVertical: 20 },
-});

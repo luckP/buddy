@@ -1,41 +1,42 @@
-import { StyleSheet } from "react-native";
+import { StyleSheet } from 'react-native';
+import { COLORS } from '../../../../constants/theme';
 
 const styles = StyleSheet.create({
     container: {
       flex: 1,
       padding: 20,
-      backgroundColor: "#fff",
+      backgroundColor: COLORS.white,
     },
     noChatsText: {
-      textAlign: "center",
+      textAlign: 'center',
       fontSize: 16,
-      color: "gray",
+      color: 'gray',
       marginTop: 20,
     },
     chatItem: {
       padding: 15,
       borderBottomWidth: 1,
-      borderBottomColor: "#ccc",
+      borderBottomColor: COLORS.gray,
     },
     chatTitle: {
       fontSize: 16,
-      fontWeight: "bold",
+      fontWeight: 'bold',
     },
     chatDate: {
       fontSize: 14,
-      color: "gray",
+      color: 'gray',
     },
     newChatButton: {
       marginTop: 20,
-      backgroundColor: "#1E90FF",
+      backgroundColor: COLORS.primary,
       padding: 15,
       borderRadius: 8,
-      alignItems: "center",
+      alignItems: 'center',
     },
     newChatButtonText: {
-      color: "#fff",
+      color: COLORS.white,
       fontSize: 16,
-      fontWeight: "bold",
+      fontWeight: 'bold',
     },
   });
 

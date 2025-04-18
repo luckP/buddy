@@ -1,0 +1,2 @@
+export const IA_PROMPT_TEXT = 'Olá! 👋 Sou seu assistente virtual e estou aqui para te ajudar com qualquer coisa relacionada ao seu animal de estimação. 🐾 Posso responder dúvidas, dar dicas de cuidados, ajudar com localização de pets perdidos ou qualquer outra questão que tiver. Como posso te ajudar hoje?';
+  

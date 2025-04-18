@@ -1,11 +1,26 @@
-import React, { useState, useEffect, useCallback } from "react";
-import { View, Text, FlatList, TouchableOpacity, ActivityIndicator } from "react-native";
-import { useFocusEffect } from "@react-navigation/native"; // ✅ Ensure the screen reloads when navigated back
+import React, { useState, useCallback } from "react";
+import { View, Text, FlatList, TouchableOpacity, ActivityIndicator, Alert } from "react-native";
+import { useFocusEffect } from "@react-navigation/native"; // Ensure the screen reloads when navigated back
 import { fetchChatList } from "../../services/chatService";
 import styles from "./ChatHistoryScreen.style";
 
+interface Chat {
+  chatId: string;
+  title: string;
+  createdAt: string;
+}
+
+/**
+ * Component for the chat history screen.
+ * Fetches the chat history from the backend, and displays a list of past chats.
+ * Also provides a button to start a new chat.
+ *
+ * @param navigation - The navigation object, needed to navigate to the chat room screen.
+ *
+ * @returns A JSX element containing the chat history list and a button to start a new chat.
+ */
 const ChatHistoryScreen = ({ navigation }: { navigation: any }) => {
-  const [chatHistory, setChatHistory] = useState<any[]>([]);
+  const [chatHistory, setChatHistory] = useState<Chat[]>([]);
   const [loading, setLoading] = useState(true);
 
   /**
@@ -18,10 +33,12 @@ const ChatHistoryScreen = ({ navigation }: { navigation: any }) => {
       setChatHistory(data);
     } catch (error) {
       console.error("Failed to fetch chat history", error);
+      Alert.alert("Error", "Failed to load chat history. Please try again.");
     } finally {
       setLoading(false);
     }
   };
+
 
   /**
    * Reload chat history whenever the screen is focused.
@@ -32,13 +49,21 @@ const ChatHistoryScreen = ({ navigation }: { navigation: any }) => {
     }, [])
   );
 
-  const handleNewChat = () => {
+  /**
+   * Navigates to the new chat screen.
+   */
+  const handleNewChat = useCallback(() => {
     navigation.navigate("ChatRoom", { isNewChat: true });
-  };
+  }, [navigation]);
 
-  const handleOpenChat = (chatId: string) => {
+  /**
+   * Opens a specific chat room based on the chat ID.
+   *
+   * @param chatId - The ID of the chat to open.
+   */
+  const handleOpenChat = useCallback((chatId: string) => {
     navigation.navigate("ChatRoom", { isNewChat: false, chatId });
-  };
+  }, [navigation]);
 
   return (
     <View style={styles.container}>

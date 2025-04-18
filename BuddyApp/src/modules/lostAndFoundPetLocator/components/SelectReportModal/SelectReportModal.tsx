@@ -1,20 +1,18 @@
 import React, { useState } from "react";
 import {
-  Modal,
-  Text,
-  TouchableOpacity,
-  View,
   FlatList,
   Image,
-  TextInput,
+  Modal,
   ScrollView,
-  Dimensions,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import Swiper from "react-native-swiper";
 import styles from "./SelectReportModal.style";
-import { LostAndFoundReport } from "../../../../models/models";
 
-const { width } = Dimensions.get("window");
+// const { width } = Dimensions.get('window');
 
 const SelectReportModal = ({ selectedReport, setSelectedReport }: any) => {
   const [comments, setComments] = useState([
@@ -31,7 +29,7 @@ const SelectReportModal = ({ selectedReport, setSelectedReport }: any) => {
         ...prev,
         { id: (prev.length + 1).toString(), text: newComment, likes: 0 },
       ]);
-      setNewComment("");
+      setNewComment('');
     }
   };
 

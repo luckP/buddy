@@ -7,7 +7,6 @@ import {
   TouchableOpacity,
   ScrollView,
   FlatList,
-  Dimensions,
 } from "react-native";
 import Swiper from "react-native-swiper";
 import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
@@ -16,7 +15,6 @@ import styles from "./PlaceDetails.style";
 import { addReview } from "../../services/placesService";
 import { COLORS } from "../../../../constants/theme";
 
-const { width } = Dimensions.get("window");
 
 const PlaceDetails = ({ route }: { route: any }) => {
   const { place } = route.params;
