@@ -137,6 +137,8 @@ export const getFeedPosts = async (req, res) => {
             images: post.images.map(imgPath => `${API_BASE_URL}${imgPath}`), // Append base URL for images
         }));
 
+        console.log('Formatted Posts:', formattedPosts);
+
         res.json({ posts: formattedPosts });
     } catch (error) {
         console.error('Feed Fetch Error:', error);

@@ -1,7 +1,8 @@
 type IaChatMessage = {
     role: "user" | "assistant";
     prompt: string;
-    date?: string;
+    date?: Date;
+    imageUrl: string;
   };
   
 

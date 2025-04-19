@@ -1,16 +1,15 @@
-import React, { useEffect, useState } from 'react';
-import {
-    FlatList,
-    View,
-    ActivityIndicator,
-    TextInput,
-    TouchableOpacity,
-    Text,
-} from 'react-native';
 import axios from 'axios';
 import { getAuth } from 'firebase/auth';
-import PostCard from '../../components/PostCard/PostCard';
+import React, { useEffect, useState } from 'react';
+import {
+    ActivityIndicator,
+    FlatList,
+    TextInput,
+    TouchableOpacity,
+    View
+} from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import PostCard from '../../components/PostCard/PostCard';
 import styles from './FeedScreen.style';
 
 const API_BASE_URL = 'http://localhost:3836/api'; // Backend URL
@@ -45,6 +44,10 @@ const FeedScreen = ({ navigation }: { navigation: any }) => {
                     'Authorization': `Bearer ${token}`,
                 },
             });
+
+            console.warn('TEST::', response.data.posts);
+
+            console.log('------------------------------------------------------');
 
 
             const newPosts = response.data.posts || [];

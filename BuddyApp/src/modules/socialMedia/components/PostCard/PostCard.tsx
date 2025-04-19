@@ -76,7 +76,9 @@ const PostCard: React.FC<PostCardProps> = ({ username, content, userImage, postI
             </TouchableOpacity>
 
             {/* Post Content */}
-            <Text style={styles.content}>{content}</Text>
+            <Text style={styles.content}>{ content }</Text>
+            <Text>{ postImage }</Text>
+            <Text>{ "test" }</Text>
 
             {/* Like, Comment, and Share Section */}
             <View style={styles.actions}>

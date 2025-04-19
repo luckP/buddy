@@ -13,6 +13,9 @@ import globalErrorHandler from './middleware/errorHandlers/globalErrorHandler.js
 import apiRoutes from './routes/api/index.js';
 import admin from './config/firebase.js';
 
+import dotenv from 'dotenv';
+dotenv.config();
+
 // ✅ Handle ES Modules Path Issues
 const __filename = fileURLToPath(import.meta.url);
 // const __dirname = path.dirname(__filename);

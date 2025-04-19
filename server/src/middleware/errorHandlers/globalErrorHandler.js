@@ -1,5 +1,8 @@
 import logger from '../../utils/logger.js';
 
+import dotenv from 'dotenv';
+dotenv.config();
+
 const globalErrorHandler = (err, req, res, next) => {
   const statusCode = res.statusCode === 200 ? 500 : res.statusCode;
   res.status(statusCode).json({

@@ -37,7 +37,17 @@ export const fetchChatList = async () => {
 export const fetchChatMessages = async (chatId: string): Promise<IaChatMessage[]> => {
   const headers = await getAuthHeaders();
   const response = await axios.post(`${BASE_URL}`, { chatId, allMessages: true }, { headers });
-  return response.data.messages;
+
+  console.warn('response:', response.data);
+  if (!response.data || !Array.isArray(response.data.messages)) {
+    console.warn('⚠️ Unexpected response from chat messages API:', response.data);
+    return []; // Return empty array to avoid .map on undefined
+  }
+
+  return response.data.messages.map((message: any): IaChatMessage => ({
+    ...message,
+    date: new Date(message.date),
+  }));
 };
 
 /**
@@ -52,8 +62,30 @@ export const createNewChat = async (prompt: string) => {
 /**
  * Sends a message to an existing chat.
  */
-export const createNewMessage = async (chatId: string, prompt: string) => {
+export const createNewMessage = async (chatId: string, prompt: string, imageUri?: string) => {
   const headers = await getAuthHeaders();
-  const response = await axios.post(`${BASE_URL}`, { chatId, prompt }, { headers });
+
+  const formData = new FormData();
+  formData.append("chatId", chatId);
+  formData.append("prompt", prompt);
+
+  if (imageUri) {
+    const fileName = imageUri.split('/').pop() || 'image.jpg';
+    formData.append("image", {
+      uri: imageUri,
+      name: fileName,
+      type: "image/jpeg",
+    } as any); // 👈 `as any` to fix React Native FormData type mismatch
+  }
+
+  const response = await axios.post(`${BASE_URL}`, formData, {
+    headers: {
+      ...headers,
+      "Content-Type": "multipart/form-data", // 👈 IMPORTANT
+    },
+  });
+
   return response.data;
 };
+
+
