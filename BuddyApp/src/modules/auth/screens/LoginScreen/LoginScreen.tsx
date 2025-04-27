@@ -1,22 +1,25 @@
+import { NavigationProp, useNavigation } from '@react-navigation/native';
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, Image, ActivityIndicator, Alert } from 'react-native';
-import { useNavigation, NavigationProp } from '@react-navigation/native';
-import styles from './LoginScreen.style';
-import { RootStackParamList } from '../../../../navigation/NavigationTypes';
-import { AuthStackParamList } from '../../navigation/NavigationTypes';
+import { ActivityIndicator, Alert, Image, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { useAuth } from '../../../../context/AuthContext';
+import { AuthStackParamList } from '../../navigation/NavigationTypes';
+import styles from './LoginScreen.style';
 
 import Icon from 'react-native-vector-icons/FontAwesome'; // ✅ Import FontAwesome icons
+import { COLORS } from '../../../../constants/theme';
 
 const LoginScreen: React.FC = () => {
-  const navigationRoot = useNavigation<NavigationProp<RootStackParamList>>();
   const navigationAuth = useNavigation<NavigationProp<AuthStackParamList>>();
   
   const { login } = useAuth();
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [passwordVisible, setPasswordVisible] = useState(false); // ✅ Password visibility state
+  const [passwordVisible, setPasswordVisible] = useState(false);
+
+  fetch('https://www.google.com')
+    .then(() => console.log("✅ Device has internet"))
+    .catch(err => console.log("❌ No internet:", err));
 
   // Validate Inputs
   const isValidEmail = (email: string) => /\S+@\S+\.\S+/.test(email);
@@ -35,7 +38,11 @@ const LoginScreen: React.FC = () => {
     setLoading(true);
     try {
       await login(email, password);
-    } finally {
+    }
+    catch (err) {
+      console.log("Error", JSON.stringify(err));
+    }
+    finally {
       setLoading(false);
     }
   };
@@ -51,7 +58,7 @@ const LoginScreen: React.FC = () => {
         onChangeText={setEmail} 
         style={styles.input} 
         placeholder="Email" 
-        placeholderTextColor="#000" 
+        placeholderTextColor={COLORS.white} 
         keyboardType='email-address' 
       />
 
@@ -61,7 +68,7 @@ const LoginScreen: React.FC = () => {
           onChangeText={setPassword} 
           style={styles.passwordInput} 
           placeholder="Password" 
-          placeholderTextColor="#000" 
+          placeholderTextColor={COLORS.white} 
           secureTextEntry={!passwordVisible} // Toggle visibility
         />
         <TouchableOpacity onPress={() => setPasswordVisible(!passwordVisible)} style={styles.eyeIcon}>

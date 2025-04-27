@@ -8,15 +8,13 @@ import {
     View
 } from 'react-native';
 import * as ImagePicker from 'react-native-image-picker';
-import * as Location from 'react-native-location'; // ✅ Import Location API
+import * as Location from 'react-native-location';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import { createPost } from '../../services/postService';
+import { API_BASE_URL, createPost } from '../../services/postService';
 import styles from './CreatePostScreen.style';
 
 
 
-
-const API_BASE_URL = 'http://localhost:3836/api'; // ✅ Backend base URL
 
 const CreatePost = ({ navigation, route }: { navigation: any; route: any }) => {
     const [content, setContent] = useState('');
@@ -39,28 +37,47 @@ const CreatePost = ({ navigation, route }: { navigation: any; route: any }) => {
             Alert.alert('Error', 'Please write some content for your post.');
             return;
         }
-    
+
         setLoading(true);
-    
+
         try {
+
+            // ✅ Ask for permission (this shows the native prompt)
+            const permissionGranted = await Location.requestPermission({
+                ios: 'whenInUse',
+                android: {
+                    detail: 'fine',
+                },
+            });
+
+            if (!permissionGranted) {
+                Alert.alert('Permission Denied', 'Location permission is required to create a post.');
+                setLoading(false);
+                return;
+            }
             // ✅ Get user location safely
             const userLocation = await Location.getLatestLocation();
             if (!userLocation || !userLocation.longitude || !userLocation.latitude) {
                 Alert.alert('Error', 'Failed to retrieve location. Ensure GPS is enabled.');
                 return;
             }
-    
+
             // ✅ Structure the location object correctly
             const location = {
                 type: 'Point',
                 coordinates: [userLocation.longitude, userLocation.latitude],
             };
-    
+
             console.log('DEBUG: Creating post with location:', location);
-    
+
             // ✅ Send post request to backend
             const newPost = await createPost(content, image, location);
-    
+
+            // ✅ Handle the response
+            newPost.images = handleImageResponse(newPost);
+
+            console.log('DEBUG: Post created successfully:', newPost);
+
             Alert.alert('Success', 'Post created successfully!');
             if (route.params?.onPostCreated) {
                 route.params.onPostCreated(newPost);
@@ -73,7 +90,21 @@ const CreatePost = ({ navigation, route }: { navigation: any; route: any }) => {
             setLoading(false);
         }
     };
-    
+
+    /**
+     * Handler the image new post
+     */
+    const handleImageResponse = (newPost: any) => {
+        if (newPost.images.length === 0) {
+            return [];
+        }
+
+        const baseUrl = API_BASE_URL.replace('/api', '');
+        return newPost.images.map((img: string) => `${baseUrl}${img}`);
+
+
+    };
+
 
     return (
         <View style={styles.container}>

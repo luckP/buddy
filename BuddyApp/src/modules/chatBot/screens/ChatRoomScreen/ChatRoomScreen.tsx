@@ -47,33 +47,41 @@ const ChatroomScreen = ({ route }: { route: any; navigation: any }) => {
   const handleSendMessage = async () => {
     const trimmedInput = inputText.trim();
     if (!trimmedInput && !selectedImage) return;
-
+  
     setLoading(true);
-
+  
     try {
-      const updatedMessages = addUserMessage(trimmedInput, selectedImage);
+      let response;
+      let newChatId = chatId;
+  
+      if (!chatId) {
+        response = await createNewChat(trimmedInput, selectedImage || undefined);
+        newChatId = response.chatId;
+        setChatId(newChatId);
+      } else {
+        response = await createNewMessage(chatId, trimmedInput, selectedImage || undefined);
+      }
+  
+      // ✅ Use imageUrl returned from backend (if present)
+      const returnedImageUrl = response?.imageUrl || null;
+  
+      const updatedMessages = addUserMessage(trimmedInput, returnedImageUrl);
       clearInput();
-
-      const newChatId = await getOrCreateChatId(chatId, trimmedInput);
-      setChatId(newChatId);
-
-      const response = await createNewMessage(newChatId, trimmedInput, selectedImage || undefined);
-
-
+      setSelectedImage(null);
+  
       if (response?.reply) {
         addAssistantReply(response.reply, updatedMessages);
       }
-
-      setSelectedImage(null); // clear preview image after sending
+  
     } catch (error) {
-      console.error('Error sending message:', error);
-
-      setSelectedImage(null); // clear preview image on error
-      Alert.alert('Erro', 'Não foi possível enviar a mensagem.');
+      console.error("Error sending message:", error);
+      setSelectedImage(null);
+      Alert.alert("Erro", "Não foi possível enviar a mensagem.");
     } finally {
       setLoading(false);
     }
   };
+  
 
 
   const addUserMessage = (prompt: string, imageUrl?: string | null): IaChatMessage[] => {

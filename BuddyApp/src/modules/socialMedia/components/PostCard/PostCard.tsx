@@ -66,19 +66,18 @@ const PostCard: React.FC<PostCardProps> = ({ username, content, userImage, postI
             {/* User Info */}
             
             <TouchableOpacity style={styles.header} onPress={navigateToProfile}>
-                <Image source={{ uri: userImage }} style={styles.userImage} />
+                {  userImage && <Image source={{ uri: userImage }} style={styles.userImage} />}
                 <Text style={styles.username}>{username}</Text>
             </TouchableOpacity>
 
             {/* Post Image (Click to View Details) */}
-            <TouchableOpacity onPress={() => setImageDetailVisible(true)}>
+            {postImage && <TouchableOpacity onPress={() => setImageDetailVisible(true)}>
                 <Image source={{ uri: postImage }} style={styles.postImage} />
             </TouchableOpacity>
-
+}
             {/* Post Content */}
             <Text style={styles.content}>{ content }</Text>
-            <Text>{ postImage }</Text>
-            <Text>{ "test" }</Text>
+            {/* <Text>{ postImage }</Text> */}
 
             {/* Like, Comment, and Share Section */}
             <View style={styles.actions}>

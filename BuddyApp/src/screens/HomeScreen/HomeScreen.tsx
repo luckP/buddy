@@ -33,6 +33,15 @@ const HomeScreen: React.FC = () => {
     navigationSocialMedia.navigate('MarketPlace');
   }
 
+  const onPressCardAiImageGenerator = () => {
+    navigationSocialMedia.navigate('AiImageGenerator');
+  };
+
+
+  const onPressCardHealthAndWellbeing = () => {
+    navigationSocialMedia.navigate('HealthAndWellbeing');
+  };
+
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <View style={styles.header}>
@@ -82,6 +91,21 @@ const HomeScreen: React.FC = () => {
           icon="paw"
           onPress={onPressCardMarketplace}
         />
+        <Card 
+          title="Gerador de Imagens com IA"
+          description="Crie imagens únicas dos seus pets com diferentes estilos artísticos!"
+          image={require('../../assets/images/home-card-images/card1.png')} // You can pick another image later
+          icon="paw"
+          onPress={onPressCardAiImageGenerator}
+        />
+        <Card 
+          title="Saúde e Bem-Estar"
+          description="Melhore a qualidade de vida do seu pet e a sua com dicas de saúde, bem-estar e rotinas diárias!"
+          image={require('../../assets/images/home-card-images/card2.png')} // ⚡ Pick an appropriate image later!
+          icon="heartbeat" // ❤️ You can change icon if you want
+          onPress={onPressCardHealthAndWellbeing}
+        />
+
         {/* Add more cards as needed */}
       </View>
 

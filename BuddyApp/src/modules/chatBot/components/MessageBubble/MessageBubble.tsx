@@ -3,6 +3,7 @@ import { View, Text, TouchableOpacity, Image } from "react-native";
 import Icon from "react-native-vector-icons/Feather";
 import styles from "./MessageBubble.style";
 import IaChatMessage from "../../../../models/IaChatMessage";
+import { API_BASE_URL } from "../../../socialMedia/services/postService";
 
 
 type Props = {
@@ -11,6 +12,7 @@ type Props = {
 
 const MessageBubble: React.FC<Props> = ({ message }) => {
     const isUser = message.role === "user";
+    const baseUrl: string = API_BASE_URL.replace('/api', '');
 
     const formatDate = (date?: Date): string => {
         if (!date) return "";
@@ -38,7 +40,7 @@ const MessageBubble: React.FC<Props> = ({ message }) => {
 
                 {message.imageUrl && (
                     <View style={styles.imageContainer}>
-                        <Image source={{ uri: message.imageUrl }} style={styles.image} />
+                        <Image source={{ uri: baseUrl + message.imageUrl }} style={styles.image} />
                     </View>
                 )}
 

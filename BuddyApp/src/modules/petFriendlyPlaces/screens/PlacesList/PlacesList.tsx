@@ -55,6 +55,8 @@ const PlacesList = ({ navigation }: any) => {
       console.log('User location:', location.latitude, location.longitude);
 
       const data = await fetchPlaces(location.latitude, location.longitude);
+
+      console.log('Nearby places:', data);
       setPlaces(data);
       setFilteredPlaces(data);
     } catch (error) {
@@ -168,6 +170,13 @@ const PlacesList = ({ navigation }: any) => {
       ) : (
         <Text style={styles.loadingText}>Loading map...</Text>
       )}
+
+      {/* Floating Button */}
+      <TouchableOpacity
+        style={styles.floatingButton}
+        onPress={() => navigation.navigate('CreatePlace')}>
+        <Text style={styles.floatingButtonText}>＋</Text>
+      </TouchableOpacity>
     </View>
   );
 };

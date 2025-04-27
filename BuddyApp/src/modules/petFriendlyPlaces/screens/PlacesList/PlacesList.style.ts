@@ -115,4 +115,29 @@ export default StyleSheet.create({
     marginTop: 20,
   },
 
+  floatingButton: {
+    position: 'absolute',
+    bottom: 20,
+    right: 20,
+    backgroundColor: '#f5a623', // orange button
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 5,
+    elevation: 5,
+    zIndex: 10,
+  },
+  floatingButtonText: {
+    color: '#fff',
+    fontSize: 30,
+    fontWeight: 'bold',
+    lineHeight: 32,
+  },
+  
+
 });

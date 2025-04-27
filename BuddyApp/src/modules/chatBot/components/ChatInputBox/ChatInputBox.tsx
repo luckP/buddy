@@ -37,7 +37,7 @@ const ChatInputBox: React.FC<Props> = ({ inputText, setInputText, onSend, loadin
         scrollEnabled
       />
       <View style={styles.buttonRow}>
-        <VoiceButton disabled={loading} />
+        {/* <VoiceButton disabled={loading} /> */}
         <ImageButton setSelectedImage={setSelectedImage} />
         <SendButton onPress={onSend} disabled={loading || !inputText.trim()} />
       </View>

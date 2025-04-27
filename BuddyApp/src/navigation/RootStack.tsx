@@ -1,48 +1,47 @@
-// src/navigation/RootStack.tsx
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
+import { useAuth } from '../context/AuthContext'; // ✅ import your context
 import AuthStack from '../modules/auth/navigation/AuthStack';
 import Menu from './MainTabs';
 import SocialMediaStack from '../modules/socialMedia/navigation/SocialMediaStack';
-import { RootStackParamList } from './NavigationTypes'; // Import RootStack types
 import LostAndFoundPetLocatorStack from '../modules/lostAndFoundPetLocator/navigation/LostAndFoundPetLocator';
 import ChatBotStack from '../modules/chatBot/navigation/ChatBotNavigator';
 import PetFriendlyPlacesStack from '../modules/petFriendlyPlaces/navigation/PetFriendlyPlaces';
-import MarketPlaceScreen from '../modules/marketPlace/screen/MarketPlaceScreen/MarketPlaceScreen';
 import MarketPlaceStack from '../modules/marketPlace/navigation/MarketPlace';
-import { onAuthStateChanged, User } from 'firebase/auth';
-import { FIREBASE_AUTH } from '../../FirebaseConfig';
+import { RootStackParamList } from './NavigationTypes';
+import { ActivityIndicator, View } from 'react-native';
+import AiImageNavigator from '../modules/aiImageGenerator/navigation/AiImageNavigator';
+import HealthAndWellbeingNavigator from '../modules/healthAndWellbeing/navigation/HealthAndWellbeingNavigator';
 
-const Stack = createStackNavigator<RootStackParamList>(); // Use RootStackParamList for typing
+const Stack = createStackNavigator<RootStackParamList>();
 
 const RootStack: React.FC = () => {
-  const [user, setUser] = useState<User | null>(null);
-  useEffect(() => onAuthStateChanged(FIREBASE_AUTH, (user) => setUser(user)), [])
+  const { user, loading } = useAuth(); // ✅ this is the key!
 
+  if (loading) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <ActivityIndicator size="large" />
+      </View>
+    );
+  }
 
   return (
     <Stack.Navigator>
-      {/* AuthStack for login, register, password recovery */}
       {!user ? (
         <Stack.Screen name="AuthStack" component={AuthStack} options={{ headerShown: false }} />
       ) : (
         <>
-        {/* Menu for the app after login */}
-        <Stack.Screen name="Menu" component={Menu} options={{ headerShown: false }} />
-        {/*Social media  */}
-        <Stack.Screen name="SocialMedia" component={SocialMediaStack} options={{ headerShown: false }} />
-        {/*Lost And Found Pet Locator */}
-        <Stack.Screen name="LostPets" component={LostAndFoundPetLocatorStack} options={{ headerShown: false }} />
-        {/*ChatBot*/}
-        <Stack.Screen name="ChatBot" component={ChatBotStack} options={{ headerShown: false }} />
-        {/*PetfriendlyPlaces*/}
-        <Stack.Screen name="PetfriendlyPlaces" component={PetFriendlyPlacesStack} options={{ headerShown: false }} />
-        {/*PetfriendlyPlaces*/}
-        <Stack.Screen name="MarketPlace" component={MarketPlaceStack} options={{ headerShown: false }} />
+          <Stack.Screen name="Menu" component={Menu} options={{ headerShown: false }} />
+          <Stack.Screen name="SocialMedia" component={SocialMediaStack} options={{ headerShown: false }} />
+          <Stack.Screen name="LostPets" component={LostAndFoundPetLocatorStack} options={{ headerShown: false }} />
+          <Stack.Screen name="ChatBot" component={ChatBotStack} options={{ headerShown: false }} />
+          <Stack.Screen name="PetfriendlyPlaces" component={PetFriendlyPlacesStack} options={{ headerShown: false }} />
+          <Stack.Screen name="MarketPlace" component={MarketPlaceStack} options={{ headerShown: false }} />
+          <Stack.Screen name="AiImageGenerator" component={AiImageNavigator} options={{ headerShown: false }} />
+          <Stack.Screen name="HealthAndWellbeing" component={HealthAndWellbeingNavigator} options={{ headerShown: false }} />
         </>
       )}
-      
-      
     </Stack.Navigator>
   );
 };

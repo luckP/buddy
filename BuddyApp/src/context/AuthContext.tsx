@@ -27,19 +27,31 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
+    console.log("🔁 Checking auth state...");
+  
     const unsubscribe = onAuthStateChanged(FIREBASE_AUTH, async (authUser) => {
+      console.log("👤 Firebase user detected:", authUser);
+  
       if (authUser) {
-        const token = await authUser.getIdToken();
-        api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-        setUser(authUser);
+        try {
+          const token = await authUser.getIdToken();
+          console.log("✅ Token retrieved:", token);
+          api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+          setUser(authUser);
+        } catch (err) {
+          console.error("❌ Error retrieving token:", err);
+        }
       } else {
+        console.log("🚫 No user signed in.");
         setUser(null);
       }
+  
       setLoading(false);
     });
-
+  
     return () => unsubscribe();
   }, []);
+  
 
   /** 🔹 Handle Firebase Login */
   const login = async (email: string, password: string) => {

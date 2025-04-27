@@ -4,6 +4,7 @@ import { PetFriendlyPlacesStackParamList } from './NavigationTypes';
 import PlacesList from '../screens/PlacesList/PlacesList';
 import PlaceDetails from '../screens/PlaceDetails/PlaceDetails';
 import { COLORS } from '../../../constants/theme';
+import CreatePlaceScreen from '../screens/CreatePlaceScreen/CreatePlaceScreen';
 
 const Stack = createStackNavigator<PetFriendlyPlacesStackParamList>();
 
@@ -24,6 +25,11 @@ const PetFriendlyPlacesStack = () => {
         name="PlaceDetails"
         component={PlaceDetails}
         options={{ headerTitle: 'Place Details' }}
+      />
+      <Stack.Screen
+        name="CreatePlace"
+        component={CreatePlaceScreen}
+        options={{ headerTitle: 'Add New Place' }}
       />
     </Stack.Navigator>
   );

@@ -15,6 +15,8 @@ export type MainTabParamList = {
     ChatBot: undefined;
     PetfriendlyPlaces: undefined;
     MarketPlace: undefined;
+    AiImageGenerator: undefined;
+    HealthAndWellbeing: undefined;
   };
 
   export type MainMenuStackParamList = {
