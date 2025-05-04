@@ -2,7 +2,6 @@ import OpenAI from "openai";
 import fs from "fs";
 import path from "path";
 import { v4 as uuidv4 } from "uuid";
-import axios from "axios";
 import dotenv from "dotenv";
 import { API_BASE_URL } from "../config/constants.js";
 import AIImage from "../models/aiImageSchema.js";
@@ -85,19 +84,24 @@ export const getAllImages = async (req, res) => {
         return res.status(500).json({ error: "Image generation failed." });
       }
   
-      // 5. Save generated image locally
+      // 5. Save generated image locally using fetch
       const genExt = ".png";
       const genName = `${uuidv4()}${genExt}`;
       const genDir = path.join("src/uploads", "generated", userId.toString());
       fs.mkdirSync(genDir, { recursive: true });
       const genPath = path.join(genDir, genName);
   
+      const imageResponse = await fetch(generatedUrl);
+  
+      if (!imageResponse.ok) {
+        throw new Error(`Failed to fetch image: ${imageResponse.statusText}`);
+      }
+  
       const writer = fs.createWriteStream(genPath);
-      const stream = await axios.get(generatedUrl, { responseType: "stream" });
-      stream.data.pipe(writer);
       await new Promise((resolve, reject) => {
+        imageResponse.body.pipe(writer);
+        imageResponse.body.on("error", reject);
         writer.on("finish", resolve);
-        writer.on("error", reject);
       });
   
       const imageUrl = `${API_BASE_URL}/uploads/generated/${userId}/${genName}`;
