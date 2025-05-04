@@ -4,7 +4,8 @@ import styles from './CreateImageScreen.style';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { launchImageLibrary } from 'react-native-image-picker';
 import { useNavigation, NavigationProp } from '@react-navigation/native';
-import { RootStackParamList } from '../../../../navigation/NavigationTypes'; // Adjust if needed
+import { RootStackParamList } from '../../../../navigation/NavigationTypes';
+import { generateAiImage } from '../../services/aiImageService';
 
 const styleOptions = ['Anime', 'Cartoon', 'Realist', 'Watercolor', 'Oil Painting'];
 
@@ -15,25 +16,24 @@ const CreateImageScreen: React.FC = () => {
   const [selectedStyle, setSelectedStyle] = useState<string | null>(null);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [modalVisible, setModalVisible] = useState(false);
-  const [modalSuccess, setModalSuccess] = useState(true); // true = success, false = fail
+  const [modalSuccess, setModalSuccess] = useState(true);
 
   const pickImage = async () => {
-    const result: any = await launchImageLibrary({
-      mediaType: 'photo',
-      quality: 1,
-    });
-
+    const result: any = await launchImageLibrary({ mediaType: 'photo', quality: 1 });
     if (result.assets && result.assets.length > 0) {
       setSelectedImage(result.assets[0].uri);
     }
   };
 
-  const handleConfirm = () => {
-    console.log({ title, description, selectedStyle, selectedImage });
-
-    // Simple validation for now
-    if (title && description && selectedStyle && selectedImage) {
-      setModalSuccess(true);
+  const handleConfirm = async () => {
+    if (description && selectedImage) {
+      try {
+        await generateAiImage(`${description}${selectedStyle ? ' in ' + selectedStyle + ' style' : ''}`, selectedImage);
+        setModalSuccess(true);
+      } catch (error) {
+        console.error('Image generation failed', error);
+        setModalSuccess(false);
+      }
     } else {
       setModalSuccess(false);
     }
@@ -47,7 +47,7 @@ const CreateImageScreen: React.FC = () => {
   const handleCloseModal = () => {
     setModalVisible(false);
     if (modalSuccess) {
-      navigation.goBack(); // Go back after success
+      navigation.goBack();
     }
   };
 
@@ -84,18 +84,10 @@ const CreateImageScreen: React.FC = () => {
         {styleOptions.map((style) => (
           <TouchableOpacity
             key={style}
-            style={[
-              styles.styleButton,
-              selectedStyle === style && styles.styleButtonSelected,
-            ]}
+            style={[styles.styleButton, selectedStyle === style && styles.styleButtonSelected]}
             onPress={() => setSelectedStyle(style)}
           >
-            <Text
-              style={[
-                styles.styleButtonText,
-                selectedStyle === style && styles.styleButtonTextSelected,
-              ]}
-            >
+            <Text style={[styles.styleButtonText, selectedStyle === style && styles.styleButtonTextSelected]}>
               {style}
             </Text>
           </TouchableOpacity>
@@ -112,20 +104,10 @@ const CreateImageScreen: React.FC = () => {
         </TouchableOpacity>
       </View>
 
-      {/* Modal */}
-      <Modal
-        visible={modalVisible}
-        transparent
-        animationType="fade"
-        onRequestClose={handleCloseModal}
-      >
+      <Modal visible={modalVisible} transparent animationType="fade" onRequestClose={handleCloseModal}>
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
-            <Icon
-              name={modalSuccess ? 'check-circle' : 'times-circle'}
-              size={60}
-              color={modalSuccess ? 'green' : 'red'}
-            />
+            <Icon name={modalSuccess ? 'check-circle' : 'times-circle'} size={60} color={modalSuccess ? 'green' : 'red'} />
             <Text style={styles.modalText}>
               {modalSuccess ? 'Imagem criada com sucesso!' : 'Erro ao criar imagem. Preencha todos os campos.'}
             </Text>
@@ -135,7 +117,6 @@ const CreateImageScreen: React.FC = () => {
           </View>
         </View>
       </Modal>
-
     </ScrollView>
   );
 };
