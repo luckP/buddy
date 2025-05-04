@@ -16,7 +16,7 @@ import HealthAndWellbeingNavigator from '../modules/healthAndWellbeing/navigatio
 const Stack = createStackNavigator<RootStackParamList>();
 
 const RootStack: React.FC = () => {
-  const { user, loading } = useAuth(); // ✅ this is the key!
+  const { user, loading } = useAuth();
 
   if (loading) {
     return (

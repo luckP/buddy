@@ -1,7 +1,8 @@
 import axios from "axios";
 import { getAuth } from "firebase/auth";
+import { API_BASE_URL } from "../../socialMedia/services/postService";
 
-const API_BASE_URL = "http://localhost:3836/api/lostFoundPets";
+const API_BASE_URL_Local = API_BASE_URL + "/lostFoundPets";
 
 /**
  * Fetch lost/found pet reports near a location.
@@ -10,7 +11,7 @@ const API_BASE_URL = "http://localhost:3836/api/lostFoundPets";
  */
 export const getReports = async (latitude: number, longitude: number) => {
   try {
-    const response = await axios.get(`${API_BASE_URL}/nearby`, {
+    const response = await axios.get(`${API_BASE_URL_Local}/nearby`, {
       params: { latitude, longitude, radius: 5 },
     });
 
@@ -79,7 +80,7 @@ export const createReport = async (
   });
 
   try {
-    const response = await axios.post(`${API_BASE_URL}`, formData, {
+    const response = await axios.post(`${API_BASE_URL_Local}`, formData, {
       headers: {
         "Content-Type": "multipart/form-data",
         Authorization: `Bearer ${token}`,
@@ -105,7 +106,7 @@ export const createReport = async (
  */
 export const getReportById = async (id: string) => {
   try {
-    const response = await axios.get(`${API_BASE_URL}/${id}`);
+    const response = await axios.get(`${API_BASE_URL_Local}/${id}`);
     return response.data;
   } catch (error) {
     console.error("ERROR: Failed to fetch report by ID", error);

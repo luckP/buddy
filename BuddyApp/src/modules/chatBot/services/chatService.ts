@@ -15,6 +15,7 @@ const getAuthHeaders = async () => {
     const user = auth.currentUser;
     if (!user) throw new Error("User is not authenticated");
     const token = await user.getIdToken();
+
     console.log("DEBUG: getAuthHeaders token:", token);
     return { Authorization: `Bearer ${token}`, "Content-Type": "application/json" };
   }

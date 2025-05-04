@@ -17,53 +17,45 @@ end
 platform :ios, '14'
 prepare_react_native_project!
 
+# Enable modular headers for Firebase compatibility
+use_frameworks! :linkage => :static
+
+# Add these Firebase modular header configurations
+$RNFirebaseAsStaticFramework = true
+pod 'Firebase/CoreOnly', :modular_headers => true
+pod 'FirebaseAuth', :modular_headers => true
+pod 'FirebaseCore', :modular_headers => true
+pod 'FirebaseCoreInternal', :modular_headers => true
+pod 'GoogleUtilities', :modular_headers => true
+pod 'FirebaseAppCheckInterop', :modular_headers => true
+pod 'FirebaseAuthInterop', :modular_headers => true
+pod 'RecaptchaInterop', :modular_headers => true
+
+pod 'React-CoreModules', :path => '../node_modules/react-native/React/CoreModules' 
+pod 'React-RCTSettings', :path => '../node_modules/react-native/Libraries/Settings'
+
 rn_maps_path = '../node_modules/react-native-maps'
 pod 'react-native-google-maps', :path => rn_maps_path
 pod 'react-native-location', :path => '../node_modules/react-native-location/react-native-location.podspec'
-
-# permissions
-# permissions_path = '../node_modules/react-native-permissions/ios'
-
-
 
 node_require('react-native/scripts/react_native_pods.rb')
 node_require('react-native-permissions/scripts/setup.rb')
 
 setup_permissions([
-  # 'AppTrackingTransparency',
-  # 'Bluetooth',
-  # 'Calendars',
-  # 'CalendarsWriteOnly',
   'Camera',
-  # 'Contacts',
-  # 'FaceID',
-  # 'LocationAccuracy',
   'LocationAlways',
   'LocationWhenInUse',
-  # 'MediaLibrary',
   'Microphone',
-  # 'Motion',
   'Notifications',
   'PhotoLibrary',
   'PhotoLibraryAddOnly',
-  # 'Reminders',
-  # 'Siri',
-  # 'SpeechRecognition',
-  # 'StoreKit',
 ])
-
-linkage = ENV['USE_FRAMEWORKS']
-if linkage != nil
-  Pod::UI.puts "Configuring Pod with #{linkage}ally linked Frameworks".green
-  use_frameworks! :linkage => linkage.to_sym
-end
 
 target 'BuddyApp' do
   config = use_native_modules!
 
   use_react_native!(
     :path => config[:reactNativePath],
-    # An absolute path to your application root.
     :app_path => "#{Pod::Config.instance.installation_root}/.."
   )
 
@@ -73,12 +65,30 @@ target 'BuddyApp' do
   end
 
   post_install do |installer|
-    # https://github.com/facebook/react-native/blob/main/packages/react-native/scripts/react_native_pods.rb#L197-L202
     react_native_post_install(
       installer,
       config[:reactNativePath],
-      :mac_catalyst_enabled => false,
-      # :ccache_enabled => true
+      :mac_catalyst_enabled => false
     )
+    
+    # Fix for header search paths
+    installer.pods_project.targets.each do |target|
+      target.build_configurations.each do |config|
+        # Fix React headers not found
+        config.build_settings['HEADER_SEARCH_PATHS'] ||= ['$(inherited)']
+        config.build_settings['HEADER_SEARCH_PATHS'] += [
+          '"$(PODS_ROOT)/Headers/Public/React-Core"',
+          '"$(PODS_ROOT)/Headers/Public/React-RCTSettings"',
+          '"$(PODS_ROOT)/Headers/Public/React-CoreModules"',
+          '"$(PODS_ROOT)/Headers/Public/ReactCommon"',
+          '"$(PODS_ROOT)/Headers/Public/yoga"',
+          '"${PODS_CONFIGURATION_BUILD_DIR}/React-Core/React-Core.modulemap"'
+        ]
+        
+        # Fix for Flipper warnings (if you're using it)
+        config.build_settings['OTHER_CFLAGS'] ||= ['$(inherited)']
+        config.build_settings['OTHER_CFLAGS'] << '-DFB_SONARKIT_ENABLED=0'
+      end
+    end
   end
 end

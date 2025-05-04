@@ -68,7 +68,7 @@ export const createChat = async (req, res) => {
 
     let assistantReply = '';
     if (prompt) {
-      assistantReply = await getAssistantReply(chat.messages);
+      assistantReply = await getAssistantReply(chat.messages, imageUrl);
     
       chat.messages.push({
         prompt: assistantReply,
@@ -228,19 +228,32 @@ async function generateTitle(prompt) {
 }
 
 /**
- * Uses OpenAI API to generate a response from the assistant based on the conversation history.
+ * Uses OpenAI API to generate a response from the assistant based on the conversation history and optional image.
  *
  * @param {Array} messages - Full message history of the chat
+ * @param {string} [imageUrl] - Optional image URL to analyze
  * @returns {string} Assistant's reply
  */
-async function getAssistantReply(messages) {
+async function getAssistantReply(messages, imageUrl) {
   const openAIMessages = messages.map(msg => ({
     role: msg.role,
-    content: msg.prompt,
+    content: [{ type: "text", text: msg.prompt }],
   }));
 
+  // Add image to the latest message if imageUrl is provided
+  if (imageUrl) {
+    const url = `${API_BASE_URL}${imageUrl}`;
+    openAIMessages.push({
+      role: "user",
+      content: [
+        { type: "text", text: "Can you describe this image?" },
+        { type: "image_url", image_url: { url } },
+      ],
+    });
+  }
+
   const response = await openai.chat.completions.create({
-    model: "gpt-4o-mini",
+    model: "gpt-4o", // or "gpt-4.1-mini" if available
     messages: openAIMessages,
   });
 

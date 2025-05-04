@@ -35,7 +35,7 @@ const HomeScreen: React.FC = () => {
         </LinearGradient>
 
         <LinearGradient colors={['#4caf50', '#2e7d32']} style={styles.quickAction}>
-          <TouchableOpacity style={styles.quickActionInner} onPress={() => navigation.navigate('ArticleList')}>
+          <TouchableOpacity style={styles.quickActionInner} onPress={() => navigation.navigate('NutritionTips')}>
             <Icon name="apple" size={24} color="#fff" />
             <Text style={styles.quickActionText}>Nutrition</Text>
           </TouchableOpacity>

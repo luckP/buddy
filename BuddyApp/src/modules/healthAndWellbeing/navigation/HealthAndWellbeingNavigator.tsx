@@ -6,6 +6,7 @@ import RoutineScreen from '../screens/RoutineScreen/RoutineScreen';
 import ArticleListScreen from '../screens/ArticleListScreen/ArticleListScreen';
 import ArticleDetailsScreen from '../screens/ArticleDetailsScreen/ArticleDetailsScreen';
 import { COLORS } from '../../../constants/theme';
+import NutritionTipsScreen from '../screens/NutritionTipsScreen/NutritionTipsScreen';
 
 const Stack = createStackNavigator<HealthAndWellbeingStackParamList>();
 
@@ -29,6 +30,11 @@ const HealthAndWellbeingNavigator: React.FC = () => {
         name="Routine"
         component={RoutineScreen}
         options={{ headerTitle: 'Daily Routines' }}
+      />
+      <Stack.Screen
+        name="NutritionTips"
+        component={NutritionTipsScreen}
+        options={{ headerTitle: 'Nutrition Tips' }}
       />
       <Stack.Screen
         name="ArticleList"
